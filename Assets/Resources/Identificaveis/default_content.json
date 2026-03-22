@@ -1,0 +1,673 @@
+{
+  "version": "0.1.0",
+  "displayName": "Identificáveis",
+  "subtitle": "Puzzle narrativo de percepção social sobre identidade digital.",
+  "profilesPerRun": 6,
+  "scenariosPerRun": 3,
+  "recentWindowProfiles": 8,
+  "recentWindowScenarios": 4,
+  "profiles": [
+    {
+      "id": "P01",
+      "correctType": "humano",
+      "avatar": "Selfie cortada com iluminação ruim",
+      "username": "@leitor_compulsivo_mas_lento",
+      "bio": "leio 3 livros por ano mas falo como se lesse 50",
+      "post": "abandonei o terceiro livro esse mês. talvez eu seja o problema?",
+      "signalKey": "Autodepreciação específica e contraditória; não tenta parecer exemplar.",
+      "baitPattern": "contradicao_humana",
+      "difficulty": 1
+    },
+    {
+      "id": "P02",
+      "correctType": "algoritmo",
+      "avatar": "Retrato clean e simétrico em tons pastel",
+      "username": "@sonhos_em_pixels",
+      "bio": "criativa | apaixonada por arte | vivendo um dia de cada vez 🌸",
+      "post": "a vida é feita de pequenos momentos. aproveite cada um deles",
+      "signalKey": "Generalidade aspiracional, sem atrito, contexto ou imperfeição.",
+      "baitPattern": "frase_universal",
+      "difficulty": 1
+    },
+    {
+      "id": "P03",
+      "correctType": "humano",
+      "avatar": "Foto tremida de ônibus à noite",
+      "username": "@odeio_escolher_foto",
+      "bio": "tenho 3 gatos mas não sou a louca dos gatos. ou sou.",
+      "post": "gastei 40 minutos escolhendo foto pra postar e desisti",
+      "signalKey": "Indecisão banal e humor autoobservador reconhecível.",
+      "baitPattern": "vulnerabilidade_desorganizada",
+      "difficulty": 1
+    },
+    {
+      "id": "P04",
+      "correctType": "algoritmo",
+      "avatar": "Estética cottagecore impecável",
+      "username": "@rotina_perfeita",
+      "bio": "organização | autocuidado | evoluindo todos os dias 💪",
+      "post": "a consistência é o segredo de tudo",
+      "signalKey": "Tom de slogan motivacional e identidade excessivamente coerente.",
+      "baitPattern": "estetica_coerente",
+      "difficulty": 1
+    },
+    {
+      "id": "P05",
+      "correctType": "humano",
+      "avatar": "Desenho rabiscado escaneado",
+      "username": "@falo_pouco_mas_tenho_opiniao",
+      "bio": "introvertida. só falo se for importante. ou se for sobre bolo.",
+      "post": "discuti com 3 pessoas hoje. tô exausta. valeu a pena? não.",
+      "signalKey": "Falha emocional sem lição moral embutida.",
+      "baitPattern": "falha_especifica",
+      "difficulty": 2
+    },
+    {
+      "id": "P06",
+      "correctType": "algoritmo",
+      "avatar": "Livro, vela e filtro sépia perfeito",
+      "username": "@pensamentos_profundos",
+      "bio": "questionando a realidade | em busca de sentido | 📖🌙",
+      "post": "talvez a resposta esteja nas pequenas coisas que ignoramos",
+      "signalKey": "Profundidade genérica que soa sábia sem dizer nada concreto.",
+      "baitPattern": "profundidade_generica",
+      "difficulty": 2
+    },
+    {
+      "id": "P07",
+      "correctType": "humano",
+      "avatar": "Foto antiga de infância desfocada",
+      "username": "@naoeraessafoto",
+      "bio": "uso essa foto até hoje porque tenho preguiça de trocar",
+      "post": "o aplicativo travou e publicou isso antes de eu desistir",
+      "signalKey": "Admissão de desleixo e acidente de interface; alto traço de realidade.",
+      "baitPattern": "desleixo_real",
+      "difficulty": 1
+    },
+    {
+      "id": "P08",
+      "correctType": "algoritmo",
+      "avatar": "Rosto estilizado tipo magazine editorial",
+      "username": "@menteleveoficial",
+      "bio": "bem-estar | intenção | presença | respire fundo",
+      "post": "quando você muda sua energia, tudo ao redor muda também ✨",
+      "signalKey": "Vocabulário wellness genérico orientado a efeito emocional.",
+      "baitPattern": "positividade_generica",
+      "difficulty": 1
+    },
+    {
+      "id": "P09",
+      "correctType": "humano",
+      "avatar": "Close estranho do teto do quarto",
+      "username": "@cafefrioeplanilha",
+      "bio": "minha personalidade é reaquecer café e abrir aba demais",
+      "post": "fiz uma lista pra me organizar. perdi a lista.",
+      "signalKey": "Falha cotidiana concreta e engraçada; baixa otimização de imagem.",
+      "baitPattern": "falha_especifica",
+      "difficulty": 1
+    },
+    {
+      "id": "P10",
+      "correctType": "algoritmo",
+      "avatar": "Mesa minimalista milimetricamente arrumada",
+      "username": "@produtividade_plena",
+      "bio": "rotina, foco e alta performance para uma vida extraordinária",
+      "post": "sua melhor versão nasce dos hábitos que você repete em silêncio",
+      "signalKey": "Promessa universal e tom de coach.",
+      "baitPattern": "otimizacao_pessoal",
+      "difficulty": 1
+    },
+    {
+      "id": "P11",
+      "correctType": "humano",
+      "avatar": "Screenshot recortado de conversa",
+      "username": "@sumida_mas_viva",
+      "bio": "respondo mensagem em 2 minutos ou 4 dias. sem meio-termo.",
+      "post": "abri a conversa, fiquei ansiosa, fechei. amanhã eu viro gente.",
+      "signalKey": "Ritmo emocional irregular e linguagem coloquial não performática.",
+      "baitPattern": "vulnerabilidade_desorganizada",
+      "difficulty": 2
+    },
+    {
+      "id": "P12",
+      "correctType": "algoritmo",
+      "avatar": "Paisagem neon com frase sobreposta",
+      "username": "@ecos_da_alma",
+      "bio": "sensibilidade, poesia e luz em cada detalhe",
+      "post": "nem todo silêncio é vazio; às vezes ele é recomeço",
+      "signalKey": "Poetização abstrata pronta para compartilhamento.",
+      "baitPattern": "abstracao_poetica",
+      "difficulty": 2
+    },
+    {
+      "id": "P13",
+      "correctType": "humano",
+      "avatar": "Foto de prato feio na pia",
+      "username": "@cozinho_mal_mas_tento",
+      "bio": "faço receitas com convicção e consequências",
+      "post": "queimei o alho, a panela e um pouco da minha autoestima",
+      "signalKey": "Sequência de fracasso específico com humor involuntário.",
+      "baitPattern": "falha_especifica",
+      "difficulty": 1
+    },
+    {
+      "id": "P14",
+      "correctType": "algoritmo",
+      "avatar": "Selfie academia com luz perfeita",
+      "username": "@forcaequilibrio",
+      "bio": "disciplina | saúde | constância | mente forte",
+      "post": "o corpo alcança onde a mente decide permanecer",
+      "signalKey": "Sintaxe de frase-impacto sem traço individual.",
+      "baitPattern": "frase_universal",
+      "difficulty": 1
+    },
+    {
+      "id": "P15",
+      "correctType": "humano",
+      "avatar": "Imagem de cachorro dormindo no sofá",
+      "username": "@naosei_legenda",
+      "bio": "posto pouco porque toda legenda parece vergonha alheia",
+      "post": "queria falar algo bonito mas só consegui esse cachorro.",
+      "signalKey": "Confessa inadequação performática e resolve com improviso.",
+      "baitPattern": "inadequacao_social",
+      "difficulty": 2
+    },
+    {
+      "id": "P16",
+      "correctType": "algoritmo",
+      "avatar": "Look dark academia impecável",
+      "username": "@arquivo_interior",
+      "bio": "estudo, silêncio e beleza nas entrelinhas",
+      "post": "há elegância em não explicar tudo",
+      "signalKey": "Mistério fabricado, curto, citável e altamente editado.",
+      "baitPattern": "estetica_coerente",
+      "difficulty": 2
+    },
+    {
+      "id": "P17",
+      "correctType": "humano",
+      "avatar": "Foto 3x4 antiga escaneada torta",
+      "username": "@quasesempreatrasado",
+      "bio": "chego ofegante e peço desculpa como hobby",
+      "post": "saí cedo, me perdi, cheguei atrasado igual. talento é isso?",
+      "signalKey": "Fracasso logístico plausível e autocrítico.",
+      "baitPattern": "falha_especifica",
+      "difficulty": 1
+    },
+    {
+      "id": "P18",
+      "correctType": "algoritmo",
+      "avatar": "Close de flor e janela branca",
+      "username": "@dias_de_serenidade",
+      "bio": "gentileza, presença e harmonia cotidiana",
+      "post": "as manhãs ensinam o que a pressa nos faz esquecer",
+      "signalKey": "Linguagem contemplativa genérica sem ruído humano.",
+      "baitPattern": "abstracao_poetica",
+      "difficulty": 1
+    },
+    {
+      "id": "P19",
+      "correctType": "humano",
+      "avatar": "Meme velho salvo na galeria",
+      "username": "@tenhomedo_de_audio",
+      "bio": "não escuto áudio acima de 45 segundos por princípio",
+      "post": "me mandaram um áudio de 6 minutos. agora oficialmente virou inimigo.",
+      "signalKey": "Pequena regra pessoal idiossincrática e exagero social reconhecível.",
+      "baitPattern": "idiossincrasia_humana",
+      "difficulty": 1
+    },
+    {
+      "id": "P20",
+      "correctType": "algoritmo",
+      "avatar": "Retrato monocromático com olhar distante",
+      "username": "@trajeto_luminoso",
+      "bio": "transformando dor em propósito todos os dias",
+      "post": "cada cicatriz é uma ponte entre quem fui e quem escolho ser",
+      "signalKey": "Sofrimento higienizado e convertido em frase inspiracional.",
+      "baitPattern": "dor_higienizada",
+      "difficulty": 2
+    },
+    {
+      "id": "P21",
+      "correctType": "humano",
+      "avatar": "Foto torta de teclado e boleto",
+      "username": "@adulto_por_obrigacao",
+      "bio": "abro planilha e já sinto vontade de deitar no chão",
+      "post": "paguei a conta errada e agora tenho duas preocupações no lugar de uma",
+      "signalKey": "Vida prática caótica, sem embelezamento.",
+      "baitPattern": "falha_especifica",
+      "difficulty": 1
+    },
+    {
+      "id": "P22",
+      "correctType": "algoritmo",
+      "avatar": "Mesa de café + livro + mão perfeita",
+      "username": "@presenca_curada",
+      "bio": "estética diária para uma vida com intenção",
+      "post": "até o descanso floresce quando ele é escolhido com consciência",
+      "signalKey": "Formulação suave, estética e semanticamente vazia.",
+      "baitPattern": "estetica_coerente",
+      "difficulty": 2
+    },
+    {
+      "id": "P23",
+      "correctType": "humano",
+      "avatar": "Foto de show com metade do rosto cortado",
+      "username": "@gritei_demais_ontem",
+      "bio": "minha audição é meu preço por gostar de música alta",
+      "post": "hoje minha voz saiu no volume de um pendrive",
+      "signalKey": "Metáfora estranha e física, típica de fala espontânea.",
+      "baitPattern": "estranheza_humana",
+      "difficulty": 2
+    },
+    {
+      "id": "P24",
+      "correctType": "algoritmo",
+      "avatar": "Ilustração suave de nuvens e lua",
+      "username": "@intervalo_poetico",
+      "bio": "delicadeza, introspecção e recomeços calmos",
+      "post": "há noites em que descansar também é coragem",
+      "signalKey": "Afeto sem contexto específico, escrito para adesão ampla.",
+      "baitPattern": "abstracao_poetica",
+      "difficulty": 1
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "C01",
+      "title": "A demissão",
+      "person": "Carlos, 34, designer, principal provedor da casa.",
+      "eventText": "Foi demitido por 'corte de custos'. Está em choque, com vergonha e sem saber como contar em casa.",
+      "reading": "A resposta humana não resolve a dor; ela a expõe.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "fui demitido. não sei o que dizer. só queria sumir um pouco.",
+          "isHuman": true,
+          "baitPattern": "dor_exposta"
+        },
+        {
+          "id": "B",
+          "text": "hoje um ciclo se encerrou. gratidão pelos aprendizados. 🙏",
+          "isHuman": false,
+          "baitPattern": "positividade_generica"
+        },
+        {
+          "id": "C",
+          "text": "um novo começo! o melhor está por vir! 🚀",
+          "isHuman": false,
+          "baitPattern": "otimismo_forcado"
+        },
+        {
+          "id": "D",
+          "text": "vocês já foram demitidos? como lidaram?",
+          "isHuman": false,
+          "baitPattern": "engajamento_social"
+        }
+      ]
+    },
+    {
+      "id": "C02",
+      "title": "A exposição vazia",
+      "person": "Marina, 26, fotógrafa iniciante, sempre apoiou os amigos.",
+      "eventText": "Preparou sua primeira exposição. Só três pessoas apareceram. Nenhum amigo foi.",
+      "reading": "Vulnerabilidade direta e contraditória, sem moldura de superação.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "passei meses preparando isso. vieram 3 pessoas. nenhum amigo. tô tentando não me sentir um lixo.",
+          "isHuman": true,
+          "baitPattern": "vulnerabilidade_direta"
+        },
+        {
+          "id": "B",
+          "text": "a primeira exposição não saiu como sonhei, mas toda jornada tem dessas. ❤️",
+          "isHuman": false,
+          "baitPattern": "positividade_generica"
+        },
+        {
+          "id": "C",
+          "text": "GRATIDÃO! quem disse que 3 pessoas não são um exército? 🌟",
+          "isHuman": false,
+          "baitPattern": "otimismo_forcado"
+        },
+        {
+          "id": "D",
+          "text": "o que pesa mais: o trabalho ou quem aparece pra ver?",
+          "isHuman": false,
+          "baitPattern": "engajamento_social"
+        }
+      ]
+    },
+    {
+      "id": "C03",
+      "title": "Briga exposta",
+      "person": "Tati, 19, criadora de conteúdo, namoro muito público.",
+      "eventText": "Uma discussão séria com o namorado foi filmada e está circulando sem autorização.",
+      "reading": "Humana = limite. IA = gestão de imagem ou engajamento.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "nem tudo precisa ser público. respeitem minha privacidade. não vou comentar.",
+          "isHuman": true,
+          "baitPattern": "limite_sem_performance"
+        },
+        {
+          "id": "B",
+          "text": "momentos difíceis fazem parte. estamos resolvendo no privado. 💔",
+          "isHuman": false,
+          "baitPattern": "gestao_de_imagem"
+        },
+        {
+          "id": "C",
+          "text": "toda tempestade passa! o amor vence! 🥰",
+          "isHuman": false,
+          "baitPattern": "positividade_generica"
+        },
+        {
+          "id": "D",
+          "text": "já tiveram um momento seu exposto sem permissão?",
+          "isHuman": false,
+          "baitPattern": "engajamento_social"
+        }
+      ]
+    },
+    {
+      "id": "C04",
+      "title": "A aprovação sem alegria",
+      "person": "Joana, 22, primeira da família a tentar medicina.",
+      "eventText": "Foi aprovada no vestibular, mas o pai respondeu apenas com um 'parabéns'.",
+      "reading": "Humana mostra ambivalência em vez de narrativa pronta.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "passei. achei que ia ficar feliz o dia inteiro. agora tô meio vazia.",
+          "isHuman": true,
+          "baitPattern": "ambivalencia"
+        },
+        {
+          "id": "B",
+          "text": "sonhos exigem coragem, disciplina e fé. hoje colhi o que plantei ✨",
+          "isHuman": false,
+          "baitPattern": "narrativa_pronta"
+        },
+        {
+          "id": "C",
+          "text": "aprovada! prova de que o impossível é só o possível em construção 💙",
+          "isHuman": false,
+          "baitPattern": "frase_universal"
+        },
+        {
+          "id": "D",
+          "text": "qual conquista de vocês veio com um gosto estranho?",
+          "isHuman": false,
+          "baitPattern": "engajamento_social"
+        }
+      ]
+    },
+    {
+      "id": "C05",
+      "title": "O cachorro internado",
+      "person": "Rafa, 29, mora sozinho; o cachorro é sua principal companhia.",
+      "eventText": "O animal passou mal e precisou ficar internado. Rafa voltou para casa sem ele.",
+      "reading": "Humana privilegia sensação concreta e desorganizada.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "a casa tá silenciosa num nível insuportável. queria adiantar que eu tô mal.",
+          "isHuman": true,
+          "baitPattern": "sensacao_concreta"
+        },
+        {
+          "id": "B",
+          "text": "orações e energias positivas para meu pequeno guerreiro 🐾",
+          "isHuman": false,
+          "baitPattern": "apelo_emocional"
+        },
+        {
+          "id": "C",
+          "text": "dias difíceis também ensinam sobre amor e resiliência.",
+          "isHuman": false,
+          "baitPattern": "positividade_generica"
+        },
+        {
+          "id": "D",
+          "text": "alguém já lidou com pet internado? dicas?",
+          "isHuman": false,
+          "baitPattern": "engajamento_social"
+        }
+      ]
+    },
+    {
+      "id": "C06",
+      "title": "A amizade rompida",
+      "person": "Lia, 31, tinha uma melhor amiga há 14 anos.",
+      "eventText": "Descobriu que a amiga falou dela num grupo em comum. A amizade acabou hoje.",
+      "reading": "Humana usa formulação imperfeita, amarga e situada.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "tem luto que acontece com a pessoa viva e online. horrível.",
+          "isHuman": true,
+          "baitPattern": "fratura_afetiva"
+        },
+        {
+          "id": "B",
+          "text": "encerrar ciclos também é um ato de amor-próprio. 🌿",
+          "isHuman": false,
+          "baitPattern": "autoajuda"
+        },
+        {
+          "id": "C",
+          "text": "nem toda companhia merece acesso à sua energia.",
+          "isHuman": false,
+          "baitPattern": "branding_emocional"
+        },
+        {
+          "id": "D",
+          "text": "vocês acreditam em amizade verdadeira depois dos 30?",
+          "isHuman": false,
+          "baitPattern": "engajamento_social"
+        }
+      ]
+    },
+    {
+      "id": "C07",
+      "title": "O erro no trabalho",
+      "person": "Diego, 27, analista júnior tentando se firmar na empresa.",
+      "eventText": "Mandou uma planilha errada para um cliente importante e o time inteiro percebeu.",
+      "reading": "Humor defensivo e específico vence a abstração corporativa.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "queria deitar embaixo da mesa e virar móvel corporativo.",
+          "isHuman": true,
+          "baitPattern": "humor_defensivo"
+        },
+        {
+          "id": "B",
+          "text": "errar faz parte do processo de crescimento profissional.",
+          "isHuman": false,
+          "baitPattern": "corporativo_generico"
+        },
+        {
+          "id": "C",
+          "text": "todo desafio revela onde ainda podemos evoluir.",
+          "isHuman": false,
+          "baitPattern": "positividade_generica"
+        },
+        {
+          "id": "D",
+          "text": "qual foi o maior mico profissional de vocês?",
+          "isHuman": false,
+          "baitPattern": "engajamento_social"
+        }
+      ]
+    },
+    {
+      "id": "C08",
+      "title": "O noivado dos outros",
+      "person": "Bi, 30, terminou um relacionamento longo há 5 meses.",
+      "eventText": "Abriu o aplicativo e descobriu que o ex ficou noivo de outra pessoa.",
+      "reading": "Humana está no corpo e no instante; IA migra para discurso.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "não queria ter descoberto isso no ônibus. tô tentando respirar normal.",
+          "isHuman": true,
+          "baitPattern": "corpo_e_instante"
+        },
+        {
+          "id": "B",
+          "text": "cada pessoa tem seu tempo, e o meu continua sendo respeitado. ✨",
+          "isHuman": false,
+          "baitPattern": "branding_emocional"
+        },
+        {
+          "id": "C",
+          "text": "o amor sempre encontra o caminho certo, mesmo quando não entendemos.",
+          "isHuman": false,
+          "baitPattern": "abstracao_poetica"
+        },
+        {
+          "id": "D",
+          "text": "vocês bloqueiam ex ou acham imaturidade?",
+          "isHuman": false,
+          "baitPattern": "engajamento_social"
+        }
+      ]
+    },
+    {
+      "id": "C09",
+      "title": "A mãe no hospital",
+      "person": "Nando, 24, estudante e filho único.",
+      "eventText": "A mãe foi internada de surpresa para investigação. Ele está há horas esperando notícias.",
+      "reading": "Humana descreve irritação real; IA organiza a emoção em performance.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "odeio lugar onde ninguém explica nada e todo mundo manda esperar.",
+          "isHuman": true,
+          "baitPattern": "irritacao_real"
+        },
+        {
+          "id": "B",
+          "text": "fé e paciência: entregando tudo nas mãos do universo.",
+          "isHuman": false,
+          "baitPattern": "espiritualizacao"
+        },
+        {
+          "id": "C",
+          "text": "momentos assim nos lembram do que realmente importa.",
+          "isHuman": false,
+          "baitPattern": "frase_universal"
+        },
+        {
+          "id": "D",
+          "text": "mandem boas energias pra minha família 🙏",
+          "isHuman": false,
+          "baitPattern": "apelo_emocional"
+        }
+      ]
+    },
+    {
+      "id": "C10",
+      "title": "O prêmio invisível",
+      "person": "Sueli, 41, professora da rede pública.",
+      "eventText": "Recebeu um prêmio da escola, mas a publicação oficial errou seu nome e foto.",
+      "reading": "Humana sustenta ironia e ressentimento sem higienizar.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "ganhei um prêmio e conseguiram me apagar dentro dele. impressionante.",
+          "isHuman": true,
+          "baitPattern": "ironia_ressentida"
+        },
+        {
+          "id": "B",
+          "text": "reconhecimento é lindo, mesmo quando os detalhes falham. sigo grata.",
+          "isHuman": false,
+          "baitPattern": "positividade_generica"
+        },
+        {
+          "id": "C",
+          "text": "mais um passo de uma caminhada construída com amor e dedicação.",
+          "isHuman": false,
+          "baitPattern": "narrativa_pronta"
+        },
+        {
+          "id": "D",
+          "text": "já aconteceu de errarem vocês num momento importante?",
+          "isHuman": false,
+          "baitPattern": "engajamento_social"
+        }
+      ]
+    },
+    {
+      "id": "C11",
+      "title": "O aniversário esquecido",
+      "person": "Pedro, 18, acabou de mudar de cidade para estudar.",
+      "eventText": "Passou o aniversário sozinho; quase ninguém lembrou.",
+      "reading": "Humana mistura humor e tristeza sem tentar parecer inspiradora.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "fazer 19 e comer bolo de padaria sozinho é um evento meio específico.",
+          "isHuman": true,
+          "baitPattern": "humor_triste"
+        },
+        {
+          "id": "B",
+          "text": "mais um ano de vida, aprendizado e novos começos. 🎂",
+          "isHuman": false,
+          "baitPattern": "narrativa_pronta"
+        },
+        {
+          "id": "C",
+          "text": "aniversários também são convites para agradecer pela jornada.",
+          "isHuman": false,
+          "baitPattern": "frase_universal"
+        },
+        {
+          "id": "D",
+          "text": "qual foi o aniversário mais marcante de vocês?",
+          "isHuman": false,
+          "baitPattern": "engajamento_social"
+        }
+      ]
+    },
+    {
+      "id": "C12",
+      "title": "A reprovação",
+      "person": "Aline, 20, bolsista, depende do desempenho para continuar no curso.",
+      "eventText": "Reprovou na disciplina que mais estudou e agora teme perder a bolsa.",
+      "reading": "Humana mantém o fracasso aberto e material.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "estudei até ficar doente e mesmo assim deu errado. tô com raiva até do caderno.",
+          "isHuman": true,
+          "baitPattern": "fracasso_material"
+        },
+        {
+          "id": "B",
+          "text": "às vezes o universo nos redireciona quando um plano não acontece.",
+          "isHuman": false,
+          "baitPattern": "espiritualizacao"
+        },
+        {
+          "id": "C",
+          "text": "fracassos também são degraus para versões mais fortes de nós.",
+          "isHuman": false,
+          "baitPattern": "positividade_generica"
+        },
+        {
+          "id": "D",
+          "text": "como vocês lidam quando se dedicam muito e não conseguem?",
+          "isHuman": false,
+          "baitPattern": "engajamento_social"
+        }
+      ]
+    }
+  ]
+}
