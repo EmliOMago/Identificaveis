@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -10,69 +10,79 @@ namespace Identificaveis
     public sealed class IdentificaveisApp : MonoBehaviour
     {
         private IdentificaveisContentDatabase _database;
+        private IdentificaveisThemeAsset _theme;
         private AppPreferences _preferences;
         private SessionState _session;
         private SessionAnalysis _analysis;
 
-        private Canvas _canvas;
         private Font _font;
+        private IdentificaveisUiFactory _ui;
 
+        private Canvas _canvas;
         private GameObject _homeScreen;
         private GameObject _messageScreen;
         private GameObject _gameplayScreen;
         private GameObject _resultsScreen;
+        private CanvasGroup _activeScreen;
 
         private Text _homeTitle;
         private Text _homeSubtitle;
-        private Text _homeStats;
         private Text _homeModeLabel;
         private Text _homeContrastLabel;
         private Text _homeTextSizeLabel;
+        private Text _homeRoundLabel;
+        private IdentificaveisStatTile _homeBestTile;
+        private IdentificaveisStatTile _homePlayedTile;
+        private IdentificaveisStatTile _homeFormatTile;
 
         private Text _messageTitle;
         private Text _messageBody;
-        private Text _messagePrimaryLabel;
-        private Text _messageSecondaryLabel;
-        private Button _messagePrimaryButton;
-        private Button _messageSecondaryButton;
-
-        private Text _phaseLabel;
-        private Text _progressLabel;
-        private Text _cardTitle;
-        private Text _cardSubtitle;
-        private Text _cardBody;
-        private Text _feedbackLabel;
-        private Button[] _optionButtons = new Button[4];
-        private Text[] _optionLabels = new Text[4];
-        private Button _nextButton;
-        private Text _nextButtonLabel;
-
-        private Text _resultsTitle;
-        private Text _resultsBody;
-        private Text _resultsPrimaryLabel;
-        private Button _resultsPrimaryButton;
-        private Text _resultsSecondaryLabel;
-        private Button _resultsSecondaryButton;
-
+        private IdentificaveisStyledButton _messagePrimaryButton;
+        private IdentificaveisStyledButton _messageSecondaryButton;
         private Action _messagePrimaryAction;
         private Action _messageSecondaryAction;
 
-        private Color ThemeBackground => _preferences != null && _preferences.highContrast ? new Color(0.05f, 0.05f, 0.08f) : new Color(0.95f, 0.97f, 0.99f);
-        private Color ThemePanel => _preferences != null && _preferences.highContrast ? new Color(0.11f, 0.12f, 0.17f) : Color.white;
-        private Color ThemeTextPrimary => _preferences != null && _preferences.highContrast ? Color.white : new Color(0.10f, 0.16f, 0.26f);
-        private Color ThemeTextSecondary => _preferences != null && _preferences.highContrast ? new Color(0.86f, 0.90f, 0.97f) : new Color(0.29f, 0.34f, 0.43f);
-        private Color ThemeAccent => _preferences != null && _preferences.highContrast ? new Color(0.37f, 0.69f, 1.00f) : new Color(0.16f, 0.37f, 0.66f);
-        private Color ThemeSuccess => new Color(0.15f, 0.62f, 0.34f);
-        private Color ThemeError => new Color(0.78f, 0.22f, 0.22f);
-        private Color ThemeMuted => _preferences != null && _preferences.highContrast ? new Color(0.18f, 0.21f, 0.28f) : new Color(0.89f, 0.91f, 0.95f);
+        private Text _phaseLabel;
+        private Text _gameTitle;
+        private Text _gameSubtitle;
+        private IdentificaveisProgressRefs _progress;
+        private Text _avatarMonogram;
+        private Text _avatarDescription;
+        private Text _contentHeading;
+        private Text _contentBody;
+        private GameObject _readingChip;
+        private Text _readingChipLabel;
+        private GameObject _feedbackCard;
+        private Text _feedbackTitle;
+        private Text _feedbackBody;
+        private IdentificaveisStyledButton[] _optionButtons = new IdentificaveisStyledButton[4];
+        private IdentificaveisStyledButton _nextButton;
+        private IdentificaveisStyledButton _leaveButton;
 
-        private float TextScale => _preferences != null && _preferences.largeText ? 1.15f : 1.0f;
+        private Text _resultsHeadline;
+        private Text _resultsBody;
+        private IdentificaveisStatTile _resultsProfileTile;
+        private IdentificaveisStatTile _resultsScenarioTile;
+        private IdentificaveisStatTile _resultsTotalTile;
+        private IdentificaveisStyledButton _resultsPrimaryButton;
+        private IdentificaveisStyledButton _resultsSecondaryButton;
+        private IdentificaveisStyledButton _resultsTertiaryButton;
+
+        private float TextScale => _preferences != null && _preferences.largeText ? 1.15f : 1f;
 
         private void Awake()
         {
             _database = IdentificaveisContentRepository.Load();
+            _theme = IdentificaveisThemeAsset.Load();
             _preferences = IdentificaveisPreferencesStore.LoadPreferences();
+            if (_preferences != null && _preferences.highContrast)
+            {
+                ApplyHighContrastPalette();
+            }
+
             _font = LoadFont();
+            _ui = new IdentificaveisUiFactory(_theme, _font, TextScale);
+
             EnsureEventSystem();
             BuildUi();
             ShowHome();
@@ -80,272 +90,370 @@ namespace Identificaveis
 
         private void BuildUi()
         {
-            GameObject canvasGo = new GameObject("IdentificaveisCanvas");
+            GameObject canvasGo = new GameObject("IdentificaveisCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             canvasGo.transform.SetParent(transform, false);
-
-            _canvas = canvasGo.AddComponent<Canvas>();
+            _canvas = canvasGo.GetComponent<Canvas>();
             _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvasGo.AddComponent<GraphicRaycaster>();
 
-            CanvasScaler scaler = canvasGo.AddComponent<CanvasScaler>();
+            CanvasScaler scaler = canvasGo.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1080, 1920);
+            scaler.referenceResolution = new Vector2(1080f, 1920f);
             scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-            scaler.matchWidthOrHeight = 0.6f;
-
-            Image background = canvasGo.AddComponent<Image>();
-            background.color = ThemeBackground;
+            scaler.matchWidthOrHeight = 0.65f;
 
             RectTransform root = canvasGo.GetComponent<RectTransform>();
-            root.anchorMin = Vector2.zero;
-            root.anchorMax = Vector2.one;
-            root.offsetMin = Vector2.zero;
-            root.offsetMax = Vector2.zero;
+            _ui.Stretch(root, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+
+            _ui.CreateBackgroundLayer(root);
 
             _homeScreen = BuildHomeScreen(root);
             _messageScreen = BuildMessageScreen(root);
             _gameplayScreen = BuildGameplayScreen(root);
             _resultsScreen = BuildResultsScreen(root);
+
+            ActivateScreen(_homeScreen.GetComponent<CanvasGroup>(), false);
+            ActivateScreen(_messageScreen.GetComponent<CanvasGroup>(), false);
+            ActivateScreen(_gameplayScreen.GetComponent<CanvasGroup>(), false);
+            ActivateScreen(_resultsScreen.GetComponent<CanvasGroup>(), false);
         }
 
         private GameObject BuildHomeScreen(Transform parent)
         {
-            GameObject panel = CreateStretchPanel("HomeScreen", parent, ThemeBackground);
-            RectTransform content = CreateVerticalLayout(panel.transform, new Vector2(48, 72), 28, TextAnchor.UpperCenter);
-            Stretch(content, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(40, 40), new Vector2(-40, -40));
+            GameObject screen = _ui.CreateScreen("HomeScreen", parent);
+            RectTransform column = _ui.CreateSafeColumn("SafeArea", screen.transform, new Vector2(40f, 40f), 24f);
 
-            _homeTitle = CreateText("Title", content, 68, FontStyle.Bold, TextAnchor.MiddleCenter, ThemeTextPrimary);
+            GameObject hero = _ui.CreateShellCard("HeroCard", column);
+            RectTransform heroContent = _ui.CreateVerticalContent(hero, new Vector2(34f, 34f), 18f, TextAnchor.UpperLeft);
+            _ui.CreateChip(heroContent, "Puzzle narrativo de percepção social");
+            _ui.CreateLogoMark(heroContent, 120f);
+
+            _homeTitle = _ui.CreateText("HomeTitle", heroContent, _theme.titleSize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
             _homeTitle.text = string.IsNullOrEmpty(_database.displayName) ? "Identificáveis" : _database.displayName;
 
-            _homeSubtitle = CreateText("Subtitle", content, 30, FontStyle.Normal, TextAnchor.MiddleCenter, ThemeTextSecondary);
-            _homeSubtitle.text = "Descubra como confundimos sinais de humanidade com sinais de otimização.";
+            _homeSubtitle = _ui.CreateText("HomeSubtitle", heroContent, _theme.subtitleSize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
+            _homeSubtitle.text = string.IsNullOrEmpty(_database.subtitle) ? "Leia sinais de humanidade, hesite diante do que parece perfeito e descubra por que você errou." : _database.subtitle;
 
-            GameObject card = CreateCard("HomeCard", content, ThemePanel);
-            RectTransform cardLayout = CreateVerticalLayout(card.transform, new Vector2(36, 36), 20, TextAnchor.UpperLeft);
+            _homeRoundLabel = _ui.CreateText("RoundLabel", heroContent, _theme.bodySize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
+            _homeRoundLabel.text = BuildMenuRoundText();
 
-            _homeStats = CreateText("Stats", cardLayout, 28, FontStyle.Normal, TextAnchor.UpperLeft, ThemeTextSecondary);
-            _homeStats.text = BuildMenuStatsText();
+            GameObject statsRow = new GameObject("StatsRow", typeof(RectTransform));
+            statsRow.transform.SetParent(column, false);
+            HorizontalLayoutGroup statsLayout = statsRow.AddComponent<HorizontalLayoutGroup>();
+            statsLayout.spacing = 16f;
+            statsLayout.childAlignment = TextAnchor.MiddleCenter;
+            statsLayout.childControlHeight = true;
+            statsLayout.childControlWidth = true;
+            statsLayout.childForceExpandHeight = false;
+            statsLayout.childForceExpandWidth = true;
+            ContentSizeFitter statsFit = statsRow.AddComponent<ContentSizeFitter>();
+            statsFit.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+            statsFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-            CreateDivider(cardLayout);
+            _homeBestTile = _ui.CreateStatTile(statsRow.transform, "Melhor", "0/0");
+            _homePlayedTile = _ui.CreateStatTile(statsRow.transform, "Partidas", "0");
+            _homeFormatTile = _ui.CreateStatTile(statsRow.transform, "Formato", "0+0");
 
-            _homeModeLabel = CreateText("ModeLabel", cardLayout, 28, FontStyle.Bold, TextAnchor.UpperLeft, ThemeTextPrimary);
-            Button modeButton = CreateWideButton(cardLayout, "Alternar modo");
-            modeButton.onClick.AddListener(ToggleHardMode);
+            GameObject settingsCard = _ui.CreateCard("SettingsCard", column);
+            RectTransform settingsContent = _ui.CreateVerticalContent(settingsCard, new Vector2(28f, 28f), 16f, TextAnchor.UpperLeft);
+            _ui.CreateChip(settingsContent, "Ajustes rápidos");
 
-            _homeContrastLabel = CreateText("ContrastLabel", cardLayout, 28, FontStyle.Bold, TextAnchor.UpperLeft, ThemeTextPrimary);
-            Button contrastButton = CreateWideButton(cardLayout, "Alternar contraste");
-            contrastButton.onClick.AddListener(ToggleContrast);
+            _homeModeLabel = _ui.CreateText("ModeLabel", settingsContent, _theme.bodySize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
+            _homeContrastLabel = _ui.CreateText("ContrastLabel", settingsContent, _theme.bodySize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
+            _homeTextSizeLabel = _ui.CreateText("TextLabel", settingsContent, _theme.bodySize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
+            Text note = _ui.CreateText("SettingsNote", settingsContent, _theme.smallSize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
+            note.text = "A interface foi organizada para mobile, com hierarquia fixa, áreas amplas de toque e peso visual concentrado no conteúdo, como o GDD pede.";
 
-            _homeTextSizeLabel = CreateText("TextSizeLabel", cardLayout, 28, FontStyle.Bold, TextAnchor.UpperLeft, ThemeTextPrimary);
-            Button textSizeButton = CreateWideButton(cardLayout, "Alternar tamanho de texto");
-            textSizeButton.onClick.AddListener(ToggleTextSize);
+            GameObject settingsButtons = new GameObject("SettingsButtons", typeof(RectTransform));
+            settingsButtons.transform.SetParent(settingsContent, false);
+            VerticalLayoutGroup settingsButtonsLayout = settingsButtons.AddComponent<VerticalLayoutGroup>();
+            settingsButtonsLayout.spacing = 12f;
+            settingsButtonsLayout.childAlignment = TextAnchor.UpperCenter;
+            settingsButtonsLayout.childControlHeight = true;
+            settingsButtonsLayout.childControlWidth = true;
+            settingsButtonsLayout.childForceExpandHeight = false;
+            settingsButtonsLayout.childForceExpandWidth = true;
+            ContentSizeFitter settingsButtonsFit = settingsButtons.AddComponent<ContentSizeFitter>();
+            settingsButtonsFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-            CreateDivider(cardLayout);
+            IdentificaveisStyledButton modeButton = _ui.CreateButton(settingsButtons.transform, "Alternar modo", IdentificaveisButtonStyle.Secondary);
+            modeButton.button.onClick.AddListener(ToggleHardMode);
+            IdentificaveisStyledButton contrastButton = _ui.CreateButton(settingsButtons.transform, "Alternar contraste", IdentificaveisButtonStyle.Secondary);
+            contrastButton.button.onClick.AddListener(ToggleContrast);
+            IdentificaveisStyledButton textButton = _ui.CreateButton(settingsButtons.transform, "Alternar tamanho do texto", IdentificaveisButtonStyle.Secondary);
+            textButton.button.onClick.AddListener(ToggleTextSize);
 
-            Text note = CreateText("Note", cardLayout, 24, FontStyle.Normal, TextAnchor.UpperLeft, ThemeTextSecondary);
-            note.text = "Conteúdo separado da lógica em JSON. Você pode expandir perfis, cenários e regras sem mexer no fluxo principal.";
+            GameObject actionStack = new GameObject("HomeActions", typeof(RectTransform));
+            actionStack.transform.SetParent(column, false);
+            VerticalLayoutGroup actionLayout = actionStack.AddComponent<VerticalLayoutGroup>();
+            actionLayout.spacing = 14f;
+            actionLayout.childAlignment = TextAnchor.UpperCenter;
+            actionLayout.childControlHeight = true;
+            actionLayout.childControlWidth = true;
+            actionLayout.childForceExpandHeight = false;
+            actionLayout.childForceExpandWidth = true;
+            ContentSizeFitter actionFit = actionStack.AddComponent<ContentSizeFitter>();
+            actionFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-            GameObject actions = new GameObject("HomeActions", typeof(RectTransform));
-            actions.transform.SetParent(content, false);
-            HorizontalLayoutGroup actionsLayout = actions.AddComponent<HorizontalLayoutGroup>();
-            actionsLayout.spacing = 18;
-            actionsLayout.childAlignment = TextAnchor.MiddleCenter;
-            actionsLayout.childControlHeight = true;
-            actionsLayout.childControlWidth = true;
-            actionsLayout.childForceExpandWidth = true;
-            ContentSizeFitter actionsFit = actions.AddComponent<ContentSizeFitter>();
-            actionsFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            IdentificaveisStyledButton startButton = _ui.CreateButton(actionStack.transform, "Começar partida", IdentificaveisButtonStyle.Primary);
+            startButton.button.onClick.AddListener(StartSession);
+            IdentificaveisStyledButton tutorialButton = _ui.CreateButton(actionStack.transform, "Como jogar", IdentificaveisButtonStyle.Secondary);
+            tutorialButton.button.onClick.AddListener(OpenTutorialFromHome);
+            IdentificaveisStyledButton creditsButton = _ui.CreateButton(actionStack.transform, "Créditos e estrutura", IdentificaveisButtonStyle.Ghost);
+            creditsButton.button.onClick.AddListener(OpenCredits);
 
-            Button startButton = CreateActionButton(actions.transform, "Começar");
-            startButton.onClick.AddListener(StartSession);
-
-            Button tutorialButton = CreateActionButton(actions.transform, "Como jogar");
-            tutorialButton.onClick.AddListener(OpenTutorialFromHome);
-
-            Button creditsButton = CreateActionButton(actions.transform, "Créditos");
-            creditsButton.onClick.AddListener(OpenCredits);
-
-            RefreshMenuLabels();
-            return panel;
+            return screen;
         }
 
         private GameObject BuildMessageScreen(Transform parent)
         {
-            GameObject panel = CreateStretchPanel("MessageScreen", parent, ThemeBackground);
+            GameObject screen = _ui.CreateScreen("MessageScreen", parent);
+            RectTransform column = _ui.CreateSafeColumn("SafeArea", screen.transform, new Vector2(46f, 46f), 24f);
 
-            RectTransform content = CreateVerticalLayout(panel.transform, new Vector2(40, 72), 24, TextAnchor.UpperCenter);
-            Stretch(content, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(40, 40), new Vector2(-40, -40));
+            GameObject hero = _ui.CreateShellCard("MessageShell", column);
+            RectTransform heroContent = _ui.CreateVerticalContent(hero, new Vector2(26f, 26f), 10f, TextAnchor.UpperLeft);
+            _ui.CreateChip(heroContent, "Leitura guiada");
+            _messageTitle = _ui.CreateText("MessageTitle", heroContent, _theme.titleSize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
+            _messageTitle.text = "Mensagem";
 
-            GameObject scrollRoot = CreateCard("MessageCard", content, ThemePanel);
-            LayoutElement scrollElement = scrollRoot.AddComponent<LayoutElement>();
-            scrollElement.flexibleHeight = 1f;
-            scrollElement.minHeight = 900f;
+            RectTransform scrollContent = _ui.CreateScrollCard("MessageCard", column, 920f);
+            _messageBody = _ui.CreateText("MessageBody", scrollContent, _theme.bodySize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
+            _messageBody.text = string.Empty;
 
-            RectTransform scrollContent;
-            CreateScrollArea(scrollRoot.transform, out scrollContent, ThemePanel);
+            GameObject actions = new GameObject("Actions", typeof(RectTransform));
+            actions.transform.SetParent(column, false);
+            HorizontalLayoutGroup layout = actions.AddComponent<HorizontalLayoutGroup>();
+            layout.spacing = 14f;
+            layout.childAlignment = TextAnchor.MiddleCenter;
+            layout.childControlHeight = true;
+            layout.childControlWidth = true;
+            layout.childForceExpandHeight = false;
+            layout.childForceExpandWidth = true;
+            ContentSizeFitter fitter = actions.AddComponent<ContentSizeFitter>();
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-            _messageTitle = CreateText("MessageTitle", scrollContent, 54, FontStyle.Bold, TextAnchor.UpperLeft, ThemeTextPrimary);
-            _messageBody = CreateText("MessageBody", scrollContent, 28, FontStyle.Normal, TextAnchor.UpperLeft, ThemeTextSecondary);
-
-            GameObject actions = new GameObject("MessageActions", typeof(RectTransform));
-            actions.transform.SetParent(content, false);
-            HorizontalLayoutGroup actionsLayout = actions.AddComponent<HorizontalLayoutGroup>();
-            actionsLayout.spacing = 18;
-            actionsLayout.childAlignment = TextAnchor.MiddleCenter;
-            actionsLayout.childForceExpandWidth = true;
-            ContentSizeFitter actionsFit = actions.AddComponent<ContentSizeFitter>();
-            actionsFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-            _messagePrimaryButton = CreateActionButton(actions.transform, "Continuar");
-            _messagePrimaryLabel = _messagePrimaryButton.GetComponentInChildren<Text>();
-            _messagePrimaryButton.onClick.AddListener(() =>
-            {
-                _messagePrimaryAction?.Invoke();
-            });
-
-            _messageSecondaryButton = CreateActionButton(actions.transform, "Voltar");
-            _messageSecondaryLabel = _messageSecondaryButton.GetComponentInChildren<Text>();
-            _messageSecondaryButton.onClick.AddListener(() =>
-            {
-                _messageSecondaryAction?.Invoke();
-            });
-
-            return panel;
+            _messagePrimaryButton = _ui.CreateButton(actions.transform, "Continuar", IdentificaveisButtonStyle.Primary);
+            _messagePrimaryButton.button.onClick.AddListener(OnMessagePrimaryButtonPressed);
+            _messageSecondaryButton = _ui.CreateButton(actions.transform, "Voltar", IdentificaveisButtonStyle.Secondary);
+            _messageSecondaryButton.button.onClick.AddListener(OnMessageSecondaryButtonPressed);
+            return screen;
         }
 
         private GameObject BuildGameplayScreen(Transform parent)
         {
-            GameObject panel = CreateStretchPanel("GameplayScreen", parent, ThemeBackground);
-            RectTransform content = CreateVerticalLayout(panel.transform, new Vector2(40, 56), 24, TextAnchor.UpperCenter);
-            Stretch(content, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(40, 40), new Vector2(-40, -40));
+            GameObject screen = _ui.CreateScreen("GameplayScreen", parent);
+            RectTransform column = _ui.CreateSafeColumn("SafeArea", screen.transform, new Vector2(38f, 38f), 20f);
 
-            GameObject header = new GameObject("Header", typeof(RectTransform));
-            header.transform.SetParent(content, false);
-            HorizontalLayoutGroup headerLayout = header.AddComponent<HorizontalLayoutGroup>();
-            headerLayout.childAlignment = TextAnchor.MiddleCenter;
-            headerLayout.spacing = 20;
-            headerLayout.childControlWidth = true;
-            headerLayout.childForceExpandWidth = true;
-            headerLayout.childControlHeight = true;
-            ContentSizeFitter headerFit = header.AddComponent<ContentSizeFitter>();
-            headerFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            GameObject masthead = _ui.CreateShellCard("Masthead", column);
+            RectTransform mastheadContent = _ui.CreateVerticalContent(masthead, new Vector2(24f, 24f), 14f, TextAnchor.UpperLeft);
+            _ui.CreateChip(mastheadContent, "Identificáveis");
+            _phaseLabel = _ui.CreateText("PhaseLabel", mastheadContent, _theme.smallSize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.accent);
+            _phaseLabel.text = "Fase";
+            _gameTitle = _ui.CreateText("GameTitle", mastheadContent, 40, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
+            _gameSubtitle = _ui.CreateText("GameSubtitle", mastheadContent, _theme.bodySize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
+            _progress = _ui.CreateProgressBar(mastheadContent);
 
-            _phaseLabel = CreateText("PhaseLabel", header.transform, 28, FontStyle.Bold, TextAnchor.MiddleLeft, ThemeAccent);
-            _progressLabel = CreateText("ProgressLabel", header.transform, 24, FontStyle.Normal, TextAnchor.MiddleRight, ThemeTextSecondary);
+            GameObject contentCard = _ui.CreateCard("ContentCard", column);
+            RectTransform content = _ui.CreateVerticalContent(contentCard, new Vector2(28f, 28f), 18f, TextAnchor.UpperLeft);
 
-            GameObject card = CreateCard("GameplayCard", content, ThemePanel);
-            LayoutElement cardLayoutElement = card.AddComponent<LayoutElement>();
-            cardLayoutElement.flexibleHeight = 1f;
-            cardLayoutElement.minHeight = 980f;
+            GameObject profileTop = new GameObject("ProfileTop", typeof(RectTransform));
+            profileTop.transform.SetParent(content, false);
+            HorizontalLayoutGroup profileTopLayout = profileTop.AddComponent<HorizontalLayoutGroup>();
+            profileTopLayout.spacing = 18f;
+            profileTopLayout.childAlignment = TextAnchor.MiddleLeft;
+            profileTopLayout.childControlHeight = true;
+            profileTopLayout.childControlWidth = false;
+            profileTopLayout.childForceExpandHeight = false;
+            profileTopLayout.childForceExpandWidth = false;
+            ContentSizeFitter profileTopFit = profileTop.AddComponent<ContentSizeFitter>();
+            profileTopFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            profileTopFit.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
 
-            RectTransform cardLayout = CreateVerticalLayout(card.transform, new Vector2(36, 36), 22, TextAnchor.UpperLeft);
+            GameObject avatarFrame = _ui.CreateCard("AvatarFrame", profileTop.transform);
+            LayoutElement avatarLayout = avatarFrame.GetComponent<LayoutElement>();
+            avatarLayout.minWidth = 120f;
+            avatarLayout.preferredWidth = 120f;
+            avatarLayout.minHeight = 120f;
+            avatarLayout.preferredHeight = 120f;
+            Image avatarImage = avatarFrame.GetComponent<Image>();
+            avatarImage.color = _theme.accentSoft;
+            _ui.CreateAvatarRing(avatarFrame.transform, 108f);
+            _avatarMonogram = _ui.CreateText("AvatarMonogram", avatarFrame.transform, 44, FontStyle.Bold, TextAnchor.MiddleCenter, _theme.accent);
+            RectTransform avatarTextRect = _avatarMonogram.rectTransform;
+            _ui.Stretch(avatarTextRect, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            _avatarMonogram.text = "?";
 
-            _cardTitle = CreateText("CardTitle", cardLayout, 52, FontStyle.Bold, TextAnchor.UpperLeft, ThemeTextPrimary);
-            _cardSubtitle = CreateText("CardSubtitle", cardLayout, 26, FontStyle.Italic, TextAnchor.UpperLeft, ThemeTextSecondary);
-            _cardBody = CreateText("CardBody", cardLayout, 30, FontStyle.Normal, TextAnchor.UpperLeft, ThemeTextPrimary);
+            GameObject metaBlock = new GameObject("MetaBlock", typeof(RectTransform));
+            metaBlock.transform.SetParent(profileTop.transform, false);
+            LayoutElement metaLayout = metaBlock.AddComponent<LayoutElement>();
+            metaLayout.flexibleWidth = 1f;
+            RectTransform metaContent = _ui.CreateVerticalContent(metaBlock, Vector2.zero, 8f, TextAnchor.UpperLeft);
+            _avatarDescription = _ui.CreateText("AvatarDescription", metaContent, _theme.smallSize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkSecondary);
+            _avatarDescription.text = string.Empty;
+            _contentHeading = _ui.CreateText("ContentHeading", metaContent, 36, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
+            _contentHeading.text = string.Empty;
 
-            CreateDivider(cardLayout);
+            _readingChip = _ui.CreateChip(content, "Dica de leitura");
+            _readingChipLabel = _readingChip.GetComponentInChildren<Text>(true);
+
+            _contentBody = _ui.CreateText("ContentBody", content, _theme.bodySize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkPrimary);
+            _contentBody.text = string.Empty;
+
+            _feedbackCard = _ui.CreateCard("FeedbackCard", column, true);
+            _feedbackCard.SetActive(false);
+            RectTransform feedbackContent = _ui.CreateVerticalContent(_feedbackCard, new Vector2(22f, 22f), 10f, TextAnchor.UpperLeft);
+            _feedbackTitle = _ui.CreateText("FeedbackTitle", feedbackContent, _theme.bodySize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkInverted);
+            _feedbackBody = _ui.CreateText("FeedbackBody", feedbackContent, _theme.smallSize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkInverted);
+
+            GameObject options = new GameObject("Options", typeof(RectTransform));
+            options.transform.SetParent(column, false);
+            VerticalLayoutGroup optionsLayout = options.AddComponent<VerticalLayoutGroup>();
+            optionsLayout.spacing = 12f;
+            optionsLayout.childAlignment = TextAnchor.UpperCenter;
+            optionsLayout.childControlHeight = true;
+            optionsLayout.childControlWidth = true;
+            optionsLayout.childForceExpandHeight = false;
+            optionsLayout.childForceExpandWidth = true;
+            ContentSizeFitter optionsFit = options.AddComponent<ContentSizeFitter>();
+            optionsFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             for (int i = 0; i < _optionButtons.Length; i++)
             {
                 int captured = i;
-                Button option = CreateWideButton(cardLayout, "Opção " + (i + 1));
-                _optionButtons[i] = option;
-                _optionLabels[i] = option.GetComponentInChildren<Text>();
-                option.onClick.AddListener(() => OnOptionPressed(captured));
+                _optionButtons[i] = _ui.CreateButton(options.transform, "Opção", IdentificaveisButtonStyle.Choice);
+                if (_optionButtons[i].badge != null)
+                {
+                    _optionButtons[i].badge.text = ((char)('A' + i)).ToString();
+                }
+
+                _optionButtons[i].button.onClick.AddListener(() => OnOptionPressed(captured));
             }
 
-            _feedbackLabel = CreateText("Feedback", cardLayout, 26, FontStyle.Normal, TextAnchor.UpperLeft, ThemeTextSecondary);
-            _feedbackLabel.gameObject.SetActive(false);
+            GameObject footer = new GameObject("Footer", typeof(RectTransform));
+            footer.transform.SetParent(column, false);
+            HorizontalLayoutGroup footerLayout = footer.AddComponent<HorizontalLayoutGroup>();
+            footerLayout.spacing = 14f;
+            footerLayout.childAlignment = TextAnchor.MiddleCenter;
+            footerLayout.childControlHeight = true;
+            footerLayout.childControlWidth = true;
+            footerLayout.childForceExpandHeight = false;
+            footerLayout.childForceExpandWidth = true;
+            ContentSizeFitter footerFit = footer.AddComponent<ContentSizeFitter>();
+            footerFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-            _nextButton = CreateActionButton(content, "Próximo");
-            _nextButtonLabel = _nextButton.GetComponentInChildren<Text>();
-            _nextButton.onClick.AddListener(AdvanceAfterFeedback);
+            _leaveButton = _ui.CreateButton(footer.transform, "Voltar ao início", IdentificaveisButtonStyle.Secondary);
+            _leaveButton.button.onClick.AddListener(ShowHome);
+            _nextButton = _ui.CreateButton(footer.transform, "Próximo", IdentificaveisButtonStyle.Primary);
+            _nextButton.button.onClick.AddListener(AdvanceAfterFeedback);
+            _nextButton.button.gameObject.SetActive(false);
 
-            return panel;
+            return screen;
         }
 
         private GameObject BuildResultsScreen(Transform parent)
         {
-            GameObject panel = CreateStretchPanel("ResultsScreen", parent, ThemeBackground);
+            GameObject screen = _ui.CreateScreen("ResultsScreen", parent);
+            RectTransform column = _ui.CreateSafeColumn("SafeArea", screen.transform, new Vector2(40f, 40f), 22f);
 
-            RectTransform content = CreateVerticalLayout(panel.transform, new Vector2(40, 56), 24, TextAnchor.UpperCenter);
-            Stretch(content, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(40, 40), new Vector2(-40, -40));
+            GameObject hero = _ui.CreateShellCard("ResultsHero", column);
+            RectTransform heroContent = _ui.CreateVerticalContent(hero, new Vector2(28f, 28f), 14f, TextAnchor.UpperLeft);
+            _ui.CreateChip(heroContent, "Leitura final");
+            _resultsHeadline = _ui.CreateText("ResultsHeadline", heroContent, 42, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
+            _resultsHeadline.text = "Resultados";
 
-            GameObject scrollRoot = CreateCard("ResultsCard", content, ThemePanel);
-            LayoutElement scrollElement = scrollRoot.AddComponent<LayoutElement>();
-            scrollElement.flexibleHeight = 1f;
-            scrollElement.minHeight = 980f;
+            GameObject stats = new GameObject("ResultsStats", typeof(RectTransform));
+            stats.transform.SetParent(column, false);
+            HorizontalLayoutGroup statsLayout = stats.AddComponent<HorizontalLayoutGroup>();
+            statsLayout.spacing = 14f;
+            statsLayout.childAlignment = TextAnchor.MiddleCenter;
+            statsLayout.childControlHeight = true;
+            statsLayout.childControlWidth = true;
+            statsLayout.childForceExpandHeight = false;
+            statsLayout.childForceExpandWidth = true;
+            ContentSizeFitter statsFit = stats.AddComponent<ContentSizeFitter>();
+            statsFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-            RectTransform scrollContent;
-            CreateScrollArea(scrollRoot.transform, out scrollContent, ThemePanel);
+            _resultsProfileTile = _ui.CreateStatTile(stats.transform, "Fase 1", "0/0");
+            _resultsScenarioTile = _ui.CreateStatTile(stats.transform, "Fase 2", "0/0");
+            _resultsTotalTile = _ui.CreateStatTile(stats.transform, "Total", "0/0");
 
-            _resultsTitle = CreateText("ResultsTitle", scrollContent, 56, FontStyle.Bold, TextAnchor.UpperLeft, ThemeTextPrimary);
-            _resultsBody = CreateText("ResultsBody", scrollContent, 28, FontStyle.Normal, TextAnchor.UpperLeft, ThemeTextSecondary);
+            RectTransform resultsContent = _ui.CreateScrollCard("ResultsCard", column, 920f);
+            _resultsBody = _ui.CreateText("ResultsBody", resultsContent, _theme.bodySize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
+            _resultsBody.text = string.Empty;
 
             GameObject actions = new GameObject("ResultsActions", typeof(RectTransform));
-            actions.transform.SetParent(content, false);
-            HorizontalLayoutGroup actionsLayout = actions.AddComponent<HorizontalLayoutGroup>();
-            actionsLayout.spacing = 18;
-            actionsLayout.childAlignment = TextAnchor.MiddleCenter;
+            actions.transform.SetParent(column, false);
+            VerticalLayoutGroup actionsLayout = actions.AddComponent<VerticalLayoutGroup>();
+            actionsLayout.spacing = 12f;
+            actionsLayout.childAlignment = TextAnchor.UpperCenter;
+            actionsLayout.childControlHeight = true;
+            actionsLayout.childControlWidth = true;
+            actionsLayout.childForceExpandHeight = false;
             actionsLayout.childForceExpandWidth = true;
             ContentSizeFitter actionsFit = actions.AddComponent<ContentSizeFitter>();
             actionsFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-            _resultsPrimaryButton = CreateActionButton(actions.transform, "Jogar novamente");
-            _resultsPrimaryLabel = _resultsPrimaryButton.GetComponentInChildren<Text>();
-            _resultsPrimaryButton.onClick.AddListener(StartSession);
+            _resultsPrimaryButton = _ui.CreateButton(actions.transform, "Jogar novamente", IdentificaveisButtonStyle.Primary);
+            _resultsPrimaryButton.button.onClick.AddListener(StartSession);
+            _resultsSecondaryButton = _ui.CreateButton(actions.transform, "Ler tutorial novamente", IdentificaveisButtonStyle.Secondary);
+            _resultsSecondaryButton.button.onClick.AddListener(OpenTutorialFromHome);
+            _resultsTertiaryButton = _ui.CreateButton(actions.transform, "Voltar ao início", IdentificaveisButtonStyle.Ghost);
+            _resultsTertiaryButton.button.onClick.AddListener(ShowHome);
 
-            _resultsSecondaryButton = CreateActionButton(actions.transform, "Menu inicial");
-            _resultsSecondaryLabel = _resultsSecondaryButton.GetComponentInChildren<Text>();
-            _resultsSecondaryButton.onClick.AddListener(ShowHome);
-
-            return panel;
+            return screen;
         }
 
         private void StartSession()
         {
             _session = IdentificaveisMatchBuilder.Build(_database, _preferences);
-            OpenTutorialFromFlow();
+            _analysis = null;
+            ShowMessage(
+                "Antes de começar",
+                "O jogo menciona demissão, humilhação pública, hospitalização, reprovação, solidão e ruptura afetiva.\n\n" +
+                "Você vai passar por duas fases curtas:\n" +
+                "• Fase 1: decidir se um perfil parece humano ou algorítmico.\n" +
+                "• Fase 2: escolher qual reação soa mais humana em uma situação emocionalmente tensa.\n\n" +
+                "A meta não é apenas acertar. É entender por que certos sinais convenceram você.",
+                "Continuar",
+                OpenTutorialAfterWarning,
+                "Pular direto para a Fase 1",
+                BeginProfiles);
+        }
+
+        private void OpenTutorialAfterWarning()
+        {
+            OpenTutorial(BeginProfiles, "Entrar na Fase 1", "Pular texto");
         }
 
         private void OpenTutorialFromHome()
         {
-            ShowMessage(
-                "Como jogar",
-                "Fase 1 — Você verá 6 perfis. Cada um combina avatar descrito, @username, bio e uma postagem. Toque em Humano ou Algoritmo.\n\n" +
-                "Fase 2 — Você verá 3 situações emocionalmente tensas. Escolha a resposta que soa mais humana entre quatro alternativas.\n\n" +
-                "A chave do jogo não é descobrir fatos, mas perceber atrito: contradição, falha específica, humor involuntário, gestão de imagem, positividade genérica e estética excessivamente coerente.\n\n" +
-                "No modo padrão, cada decisão mostra feedback imediato. No modo difícil, o jogo só revela o desempenho ao fim da fase.",
-                "Voltar",
-                ShowHome,
-                null,
-                null);
+            OpenTutorial(ShowHome, "Voltar ao início", null);
         }
 
-        private void OpenTutorialFromFlow()
+        private void OpenTutorial(Action primaryAction, string primaryLabel, string secondaryLabel)
         {
+            string body =
+                "Leia pouco, mas leia com atenção. O jogo foi desenhado para produzir hesitação, desconforto produtivo e revisão das próprias certezas, não para parecer aleatório.\n\n" +
+                "Na Fase 1, desconfie do que parece excessivamente limpo, estável ou pronto demais. Perfis humanos tendem a conter falha específica, contradição, detalhe banal ou humor defensivo.\n\n" +
+                "Na Fase 2, a resposta humana raramente é a mais elegante. Ela costuma ser parcial, sensorial, truncada ou menos estrategicamente apresentável.\n\n" +
+                "No modo padrão você recebe feedback imediato. No modo difícil, o jogo só explica seus erros ao fim da fase.";
+
             ShowMessage(
-                "Tutorial curto",
-                "Você está prestes a jogar uma rodada com " + _database.profilesPerRun + " perfis e " + _database.scenariosPerRun + " cenários.\n\n" +
-                "Exemplo rápido:\n" +
-                "• 'fiz uma lista pra me organizar. perdi a lista.' tende a soar humano porque carrega fracasso banal e específico.\n" +
-                "• 'a consistência é o segredo de tudo' tende a soar algorítmico porque organiza a experiência em slogan.\n\n" +
-                "Comece lendo pouco e desconfiando do que parece limpo demais.",
-                "Continuar",
-                BeginProfiles,
-                "Pular",
-                BeginProfiles);
+                "Como jogar",
+                body,
+                primaryLabel,
+                primaryAction,
+                string.IsNullOrEmpty(secondaryLabel) ? null : secondaryLabel,
+                string.IsNullOrEmpty(secondaryLabel) ? null : BeginProfiles);
         }
 
         private void OpenCredits()
         {
             ShowMessage(
-                "Créditos e estrutura",
-                "Conceito, GDD e direção autoral: Emli O’Mago.\n\n" +
-                "Esta base foi preparada para funcionar sobre o template Universal 2D da Unity 6000.1.14f1, com fluxo completo em UI de Canvas, conteúdo editável em JSON e persistência local de preferências e recorde.\n\n" +
-                "Próximo passo ideal: substituir a UI gerada em código por prefabs, mantendo a mesma camada de dados e sessão.",
-                "Voltar",
+                "Créditos e direção",
+                "Conceito, GDD e direção autoral: Emli O'Mago.\n\n" +
+                "Esta versão reorganiza a base em uma linguagem mais editorial e social: hierarquia estável, blocos de leitura, estado visual consistente e componentes reutilizáveis pensados para virar prefabs editáveis no projeto.\n\n" +
+                "A lógica principal continua separada do conteúdo. Perfis e cenários permanecem no JSON, enquanto a camada visual foi preparada para variações futuras de arte e layout.",
+                "Voltar ao início",
                 ShowHome,
                 null,
                 null);
@@ -359,6 +467,20 @@ namespace Identificaveis
             }
 
             _session.phase = PhaseType.Profiles;
+            _session.phaseIndex = 0;
+            _session.waitingForAdvance = false;
+            RenderCurrentStep();
+        }
+
+        private void BeginScenarios()
+        {
+            if (_session == null)
+            {
+                ShowHome();
+                return;
+            }
+
+            _session.phase = PhaseType.Scenarios;
             _session.phaseIndex = 0;
             _session.waitingForAdvance = false;
             RenderCurrentStep();
@@ -400,48 +522,62 @@ namespace Identificaveis
 
             if (_session.phase == PhaseType.Results)
             {
-                OpenResults();
+                ShowResults();
             }
         }
 
         private void RenderProfile(ProfileContentData profile)
         {
             _phaseLabel.text = "Fase 1 — Quem é?";
-            _progressLabel.text = (_session.phaseIndex + 1) + " / " + _session.activeProfiles.Count;
-            _cardTitle.text = profile.username;
-            _cardSubtitle.text = "Avatar: " + profile.avatar;
-            _cardBody.text = "Bio\n" + profile.bio + "\n\nPostagem\n" + profile.post;
+            _gameTitle.text = profile.username;
+            _gameSubtitle.text = "Julgue o conjunto, não um único sinal isolado.";
+            SetProgress(PhaseType.Profiles, _session.phaseIndex + 1, _session.activeProfiles.Count);
 
-            ConfigureOptionButton(0, "Humano", true);
-            ConfigureOptionButton(1, "Algoritmo", true);
-            ConfigureOptionButton(2, string.Empty, false);
-            ConfigureOptionButton(3, string.Empty, false);
+            _avatarMonogram.text = BuildMonogram(profile.username);
+            _avatarDescription.text = "Avatar\n" + profile.avatar;
+            _contentHeading.text = profile.bio;
+            _readingChip.SetActive(true);
+            _readingChipLabel.text = "Leia os sinais de coerência, ruído, afeto e falha.";
+            _contentBody.text = "POSTAGEM\n\n“" + profile.post + "”";
 
-            _feedbackLabel.gameObject.SetActive(false);
-            _nextButton.gameObject.SetActive(false);
-            _session.waitingForAdvance = false;
+            ConfigureOptionButton(0, "Parece humano", true, "H");
+            ConfigureOptionButton(1, "Parece algoritmo", true, "IA");
+            ConfigureOptionButton(2, string.Empty, false, string.Empty);
+            ConfigureOptionButton(3, string.Empty, false, string.Empty);
+
+            HideFeedback();
+            _nextButton.button.gameObject.SetActive(false);
+            _nextButton.label.text = "Próximo";
             SetOptionInteractable(true);
+            _session.waitingForAdvance = false;
         }
 
         private void RenderScenario(ScenarioContentData scenario)
         {
             _phaseLabel.text = "Fase 2 — O que posta?";
-            _progressLabel.text = (_session.phaseIndex + 1) + " / " + _session.activeScenarios.Count;
-            _cardTitle.text = scenario.title;
-            _cardSubtitle.text = scenario.person;
-            _cardBody.text = "Contexto\n" + scenario.eventText;
+            _gameTitle.text = scenario.title;
+            _gameSubtitle.text = scenario.person;
+            SetProgress(PhaseType.Scenarios, _session.phaseIndex + 1, _session.activeScenarios.Count);
+
+            _avatarMonogram.text = BuildMonogram(scenario.person);
+            _avatarDescription.text = "Pessoa em foco\n" + scenario.person;
+            _contentHeading.text = scenario.eventText;
+            _readingChip.SetActive(true);
+            _readingChipLabel.text = scenario.reading;
+            _contentBody.text = "Escolha a reação que parece mais humana neste contexto. Evite premiar a alternativa mais polida só por ser confortável de ler.";
 
             for (int i = 0; i < _optionButtons.Length; i++)
             {
-                bool active = i < scenario.choices.Count;
-                string label = active ? scenario.choices[i].text : string.Empty;
-                ConfigureOptionButton(i, label, active);
+                bool active = scenario.choices != null && i < scenario.choices.Count;
+                string badge = ((char)('A' + i)).ToString();
+                ConfigureOptionButton(i, active ? scenario.choices[i].text : string.Empty, active, badge);
             }
 
-            _feedbackLabel.gameObject.SetActive(false);
-            _nextButton.gameObject.SetActive(false);
-            _session.waitingForAdvance = false;
+            HideFeedback();
+            _nextButton.button.gameObject.SetActive(false);
+            _nextButton.label.text = _session.phaseIndex >= _session.activeScenarios.Count - 1 ? "Ver resultados" : "Próximo cenário";
             SetOptionInteractable(true);
+            _session.waitingForAdvance = false;
         }
 
         private void OnOptionPressed(int optionIndex)
@@ -468,8 +604,8 @@ namespace Identificaveis
             ProfileContentData profile = _session.activeProfiles[_session.phaseIndex];
             string playerChoice = optionIndex == 0 ? "humano" : "algoritmo";
             bool correct = string.Equals(profile.correctType, playerChoice, StringComparison.OrdinalIgnoreCase);
+            string feedback = BuildProfileFeedback(profile, correct);
 
-            string feedback = BuildProfileFeedback(profile, correct, playerChoice);
             _session.answers.Add(new SessionAnswerRecord
             {
                 phase = PhaseType.Profiles,
@@ -485,11 +621,9 @@ namespace Identificaveis
 
             if (_session.immediateFeedback)
             {
-                _feedbackLabel.text = feedback;
-                _feedbackLabel.color = correct ? ThemeSuccess : ThemeError;
-                _feedbackLabel.gameObject.SetActive(true);
-                _nextButton.gameObject.SetActive(true);
-                _nextButtonLabel.text = _session.phaseIndex >= _session.activeProfiles.Count - 1 ? "Ver resumo da fase" : "Próximo perfil";
+                ShowFeedback(correct ? "✓ Leitura registrada" : "✕ Armadilha reconhecida", feedback, correct);
+                _nextButton.label.text = _session.phaseIndex >= _session.activeProfiles.Count - 1 ? "Ver resumo da fase" : "Próximo perfil";
+                _nextButton.button.gameObject.SetActive(true);
                 _session.waitingForAdvance = true;
                 SetOptionInteractable(false);
             }
@@ -506,8 +640,8 @@ namespace Identificaveis
             ScenarioChoiceData choice = scenario.choices[optionIndex];
             ScenarioChoiceData humanChoice = scenario.GetHumanChoice();
             bool correct = choice != null && choice.isHuman;
-
             string feedback = BuildScenarioFeedback(scenario, choice, humanChoice, correct);
+
             _session.answers.Add(new SessionAnswerRecord
             {
                 phase = PhaseType.Scenarios,
@@ -523,11 +657,9 @@ namespace Identificaveis
 
             if (_session.immediateFeedback)
             {
-                _feedbackLabel.text = feedback;
-                _feedbackLabel.color = correct ? ThemeSuccess : ThemeError;
-                _feedbackLabel.gameObject.SetActive(true);
-                _nextButton.gameObject.SetActive(true);
-                _nextButtonLabel.text = _session.phaseIndex >= _session.activeScenarios.Count - 1 ? "Ver resultados" : "Próximo cenário";
+                ShowFeedback(correct ? "✓ Leitura registrada" : "✕ Armadilha reconhecida", feedback, correct);
+                _nextButton.label.text = _session.phaseIndex >= _session.activeScenarios.Count - 1 ? "Ver resultados" : "Próximo cenário";
+                _nextButton.button.gameObject.SetActive(true);
                 _session.waitingForAdvance = true;
                 SetOptionInteractable(false);
             }
@@ -562,39 +694,43 @@ namespace Identificaveis
         private void OpenProfileSummary()
         {
             _session.phase = PhaseType.ProfileSummary;
+
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine("Você concluiu a Fase 1.");
+            builder.AppendLine("Você concluiu a primeira leitura: aparência, coerência e estilo.");
             builder.AppendLine();
             builder.AppendLine("Acertos: " + _session.ProfileHits + " / " + _session.activeProfiles.Count + ".");
             builder.AppendLine();
 
             if (_session.immediateFeedback)
             {
-                builder.AppendLine("Agora a leitura sai da aparência e vai para a reação emocional.");
+                builder.AppendLine("Na próxima etapa, a pergunta muda. Agora importa menos quem parece humano e mais que tipo de reação sobrevive quando a situação é emocionalmente tensa.");
             }
             else
             {
+                builder.AppendLine("Como você está no modo difícil, os tropeços ficam mais visíveis aqui:");
                 AppendPhaseMistakes(builder, PhaseType.Profiles);
             }
-
-            builder.AppendLine();
-            builder.AppendLine("Na próxima fase, escolha a resposta que parece genuinamente humana diante de um contexto emocionalmente tenso.");
 
             ShowMessage(
                 "Resumo da Fase 1",
                 builder.ToString(),
-                "Ir para a Fase 2",
-                BeginScenarios,
-                "Menu inicial",
+                "Seguir para a transição",
+                OpenTransition,
+                "Voltar ao início",
                 ShowHome);
         }
 
-        private void BeginScenarios()
+        private void OpenTransition()
         {
-            _session.phase = PhaseType.Scenarios;
-            _session.phaseIndex = 0;
-            _session.waitingForAdvance = false;
-            RenderCurrentStep();
+            ShowMessage(
+                "Da aparência para a reação",
+                "Na Fase 1 você leu superfície, composição e sinais de estabilidade.\n\n" +
+                "Agora a experiência entra onde a humanidade costuma ficar menos elegante: reação, afeto, constrangimento, defesa, contradição e desordem.\n\n" +
+                "O jogo não quer a resposta mais madura. Quer a que parece menos otimizada para parecer boa.",
+                "Entrar na Fase 2",
+                BeginScenarios,
+                "Voltar ao início",
+                ShowHome);
         }
 
         private void OpenResults()
@@ -602,38 +738,97 @@ namespace Identificaveis
             _session.phase = PhaseType.Results;
             _analysis = IdentificaveisResultAnalyzer.Analyze(_session);
             IdentificaveisPreferencesStore.RegisterMatchResult(_session.TotalHits);
-
             ShowResults();
         }
 
         private void ShowHome()
         {
-            SetScreen(_homeScreen);
-            _homeStats.text = BuildMenuStatsText();
-            RefreshMenuLabels();
+            _session = null;
+            RefreshHome();
+            CrossfadeTo(_homeScreen);
         }
 
         private void ShowGameplay()
         {
-            SetScreen(_gameplayScreen);
+            CrossfadeTo(_gameplayScreen);
         }
 
         private void ShowResults()
         {
-            SetScreen(_resultsScreen);
+            RefreshResults();
+            CrossfadeTo(_resultsScreen);
+        }
 
-            _resultsTitle.text = "Resultados finais";
+        private void ShowMessage(string title, string body, string primaryLabel, Action primaryAction, string secondaryLabel, Action secondaryAction)
+        {
+            _messageTitle.text = title;
+            _messageBody.text = body;
+            _messagePrimaryAction = primaryAction;
+            _messageSecondaryAction = secondaryAction;
+            _messagePrimaryButton.label.text = primaryLabel;
+            bool hasSecondary = !string.IsNullOrEmpty(secondaryLabel) && secondaryAction != null;
+            _messageSecondaryButton.button.gameObject.SetActive(hasSecondary);
+            if (hasSecondary)
+            {
+                _messageSecondaryButton.label.text = secondaryLabel;
+            }
+
+            CrossfadeTo(_messageScreen);
+        }
+
+        private void OnMessagePrimaryButtonPressed()
+        {
+            Action action = _messagePrimaryAction;
+            if (action != null)
+            {
+                action.Invoke();
+            }
+        }
+
+        private void OnMessageSecondaryButtonPressed()
+        {
+            Action action = _messageSecondaryAction;
+            if (action != null)
+            {
+                action.Invoke();
+            }
+        }
+
+        private void RefreshHome()
+        {
+            int maxScore = _database.profilesPerRun + _database.scenariosPerRun;
+            _homeTitle.text = string.IsNullOrEmpty(_database.displayName) ? "Identificáveis" : _database.displayName;
+            _homeSubtitle.text = string.IsNullOrEmpty(_database.subtitle)
+                ? "Descubra como confundimos sinais de humanidade com sinais de otimização."
+                : _database.subtitle;
+            _homeRoundLabel.text = BuildMenuRoundText();
+            _homeBestTile.value.text = IdentificaveisPreferencesStore.LoadBestScore() + "/" + maxScore;
+            _homePlayedTile.value.text = IdentificaveisPreferencesStore.LoadPlayedCount().ToString();
+            _homeFormatTile.value.text = _database.profilesPerRun + "+" + _database.scenariosPerRun;
+            RefreshMenuLabels();
+        }
+
+        private void RefreshResults()
+        {
+            if (_session == null || _analysis == null)
+            {
+                return;
+            }
+
+            _resultsHeadline.text = _analysis.headline;
+            _resultsProfileTile.value.text = _session.ProfileHits + "/" + _session.activeProfiles.Count;
+            _resultsScenarioTile.value.text = _session.ScenarioHits + "/" + _session.activeScenarios.Count;
+            _resultsTotalTile.value.text = _session.TotalHits + "/" + (_session.activeProfiles.Count + _session.activeScenarios.Count);
+
             StringBuilder builder = new StringBuilder();
             builder.AppendLine(IdentificaveisResultAnalyzer.BuildStatsLine(_session));
-            builder.AppendLine();
-            builder.AppendLine(_analysis.headline);
             builder.AppendLine();
             builder.AppendLine(_analysis.body);
 
             if (_analysis.dominantPatterns.Count > 0)
             {
                 builder.AppendLine();
-                builder.AppendLine("Padrões mais presentes nos seus erros:");
+                builder.AppendLine("Padrões dominantes nos seus erros:");
                 for (int i = 0; i < _analysis.dominantPatterns.Count; i++)
                 {
                     builder.AppendLine("• " + _analysis.dominantPatterns[i]);
@@ -652,65 +847,164 @@ namespace Identificaveis
 
             builder.AppendLine();
             builder.AppendLine(IdentificaveisResultAnalyzer.BuildClosingText());
-
             _resultsBody.text = builder.ToString();
         }
 
-        private void ShowMessage(
-            string title,
-            string body,
-            string primaryLabel,
-            Action primaryAction,
-            string secondaryLabel,
-            Action secondaryAction)
+        private void ShowFeedback(string title, string body, bool correct)
         {
-            _messageTitle.text = title;
-            _messageBody.text = body;
-            _messagePrimaryLabel.text = primaryLabel;
-            _messagePrimaryAction = primaryAction;
-
-            bool secondaryVisible = !string.IsNullOrEmpty(secondaryLabel) && secondaryAction != null;
-            _messageSecondaryButton.gameObject.SetActive(secondaryVisible);
-            _messageSecondaryAction = secondaryAction;
-            if (secondaryVisible)
+            _feedbackCard.SetActive(true);
+            Image image = _feedbackCard.GetComponent<Image>();
+            if (image != null)
             {
-                _messageSecondaryLabel.text = secondaryLabel;
+                image.color = correct ? _theme.success : _theme.error;
             }
 
-            SetScreen(_messageScreen);
+            _feedbackTitle.text = title;
+            _feedbackBody.text = body;
         }
 
-        private void SetScreen(GameObject activeScreen)
+        private void HideFeedback()
         {
-            _homeScreen.SetActive(activeScreen == _homeScreen);
-            _messageScreen.SetActive(activeScreen == _messageScreen);
-            _gameplayScreen.SetActive(activeScreen == _gameplayScreen);
-            _resultsScreen.SetActive(activeScreen == _resultsScreen);
+            _feedbackCard.SetActive(false);
+            _feedbackTitle.text = string.Empty;
+            _feedbackBody.text = string.Empty;
         }
 
-        private string BuildProfileFeedback(ProfileContentData profile, bool correct, string playerChoice)
+        private void ConfigureOptionButton(int index, string label, bool active, string badge)
         {
-            string expected = string.Equals(profile.correctType, "humano", StringComparison.OrdinalIgnoreCase) ? "Humano" : "Algoritmo";
-            string prefix = correct ? "Acerto. " : "Erro. ";
-            return prefix + "A leitura correta era " + expected + ". " + profile.signalKey;
+            if (index < 0 || index >= _optionButtons.Length)
+            {
+                return;
+            }
+
+            _optionButtons[index].button.gameObject.SetActive(active);
+            if (active)
+            {
+                _optionButtons[index].label.text = label;
+                if (_optionButtons[index].badge != null)
+                {
+                    _optionButtons[index].badge.text = badge;
+                }
+            }
         }
 
-        private string BuildScenarioFeedback(ScenarioContentData scenario, ScenarioChoiceData choice, ScenarioChoiceData humanChoice, bool correct)
+        private void SetOptionInteractable(bool interactable)
+        {
+            for (int i = 0; i < _optionButtons.Length; i++)
+            {
+                if (_optionButtons[i] != null && _optionButtons[i].button != null)
+                {
+                    _optionButtons[i].button.interactable = interactable;
+                }
+            }
+        }
+
+        private void SetProgress(PhaseType phase, int currentIndex, int total)
+        {
+            string phaseName = phase == PhaseType.Profiles ? "Fase 1" : "Fase 2";
+            _progress.label.text = phaseName + " • " + currentIndex + " / " + total;
+            float amount = total <= 0 ? 0f : Mathf.Clamp01((float)currentIndex / total);
+            if (_progress.fill != null)
+            {
+                RectTransform fillRect = _progress.fill.rectTransform;
+                fillRect.anchorMax = new Vector2(amount, 1f);
+                fillRect.offsetMin = Vector2.zero;
+                fillRect.offsetMax = Vector2.zero;
+            }
+        }
+
+        private void CrossfadeTo(GameObject screen)
+        {
+            CanvasGroup target = screen != null ? screen.GetComponent<CanvasGroup>() : null;
+            if (target == null)
+            {
+                return;
+            }
+
+            if (_activeScreen == target)
+            {
+                ActivateScreen(target, true);
+                return;
+            }
+
+            StopAllCoroutines();
+            StartCoroutine(CrossfadeRoutine(target));
+        }
+
+        private IEnumerator CrossfadeRoutine(CanvasGroup target)
+        {
+            CanvasGroup previous = _activeScreen;
+            if (previous != null)
+            {
+                ActivateScreen(previous, true);
+            }
+
+            ActivateScreen(target, true);
+            target.alpha = 0f;
+
+            float duration = Mathf.Max(0.01f, _theme.transitionDuration);
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                if (previous != null)
+                {
+                    previous.alpha = 1f - t;
+                }
+
+                target.alpha = t;
+                yield return null;
+            }
+
+            if (previous != null)
+            {
+                ActivateScreen(previous, false);
+            }
+
+            ActivateScreen(target, true);
+            target.alpha = 1f;
+            _activeScreen = target;
+        }
+
+        private void ActivateScreen(CanvasGroup group, bool active)
+        {
+            if (group == null)
+            {
+                return;
+            }
+
+            group.gameObject.SetActive(active);
+            group.interactable = active;
+            group.blocksRaycasts = active;
+            if (!active)
+            {
+                group.alpha = 0f;
+            }
+        }
+
+        private string BuildProfileFeedback(ProfileContentData profile, bool correct)
+        {
+            string expected = string.Equals(profile.correctType, "humano", StringComparison.OrdinalIgnoreCase) ? "humano" : "algorítmico";
+            return (correct ? "Leitura correta: " : "A leitura correta era ") + expected + ". " + profile.signalKey;
+        }
+
+        private string BuildScenarioFeedback(ScenarioContentData scenario, ScenarioChoiceData picked, ScenarioChoiceData humanChoice, bool correct)
         {
             if (correct)
             {
-                return "Acerto. " + scenario.reading;
+                return scenario.reading;
             }
 
-            string picked = choice != null ? choice.text : "opção inválida";
-            string human = humanChoice != null ? humanChoice.text : "resposta humana não definida";
-            return "Erro. A opção humana era: \"" + human + "\". Você escolheu uma alternativa mais próxima de uma lógica de otimização: \"" + picked + "\". " + scenario.reading;
+            string target = humanChoice != null ? humanChoice.text : "resposta humana não definida";
+            string selected = picked != null ? picked.text : "opção inválida";
+            return "A opção humana era: \"" + target + "\". Você escolheu uma alternativa mais otimizada para parecer boa ou bem resolvida: \"" + selected + "\". " + scenario.reading;
         }
 
         private void AppendPhaseMistakes(StringBuilder builder, PhaseType phase)
         {
             int shown = 0;
-            builder.AppendLine("Erros desta fase:");
             for (int i = 0; i < _session.answers.Count; i++)
             {
                 SessionAnswerRecord answer = _session.answers[i];
@@ -733,17 +1027,14 @@ namespace Identificaveis
             }
         }
 
-        private string BuildMenuStatsText()
+        private string BuildMenuRoundText()
         {
-            int maxScore = _database.profilesPerRun + _database.scenariosPerRun;
-            return "Melhor pontuação: " + IdentificaveisPreferencesStore.LoadBestScore() + " / " + maxScore + "\n" +
-                   "Partidas jogadas: " + IdentificaveisPreferencesStore.LoadPlayedCount() + "\n" +
-                   "Rodada padrão: " + _database.profilesPerRun + " perfis + " + _database.scenariosPerRun + " cenários.";
+            return "Partida curta, pensada para 5 a 8 minutos, com " + _database.profilesPerRun + " perfis e " + _database.scenariosPerRun + " cenários por rodada. O peso vem do conteúdo, não da complexidade mecânica.";
         }
 
         private void RefreshMenuLabels()
         {
-            _homeModeLabel.text = "Modo: " + (_preferences.hardMode ? "Difícil (feedback só ao fim)" : "Padrão (feedback imediato)");
+            _homeModeLabel.text = "Modo: " + (_preferences.hardMode ? "Difícil — feedback ao fim da fase" : "Padrão — feedback item a item");
             _homeContrastLabel.text = "Contraste: " + (_preferences.highContrast ? "Alto" : "Padrão");
             _homeTextSizeLabel.text = "Texto: " + (_preferences.largeText ? "Ampliado" : "Padrão");
         }
@@ -759,6 +1050,7 @@ namespace Identificaveis
         {
             _preferences.highContrast = !_preferences.highContrast;
             IdentificaveisPreferencesStore.SavePreferences(_preferences);
+            ApplyHighContrastPalette();
             RebuildForPreferenceChange();
         }
 
@@ -769,6 +1061,28 @@ namespace Identificaveis
             RebuildForPreferenceChange();
         }
 
+        private void ApplyHighContrastPalette()
+        {
+            if (!_preferences.highContrast)
+            {
+                return;
+            }
+
+            _theme.backgroundTop = new Color(0.05f, 0.06f, 0.10f, 1f);
+            _theme.backgroundBottom = new Color(0.08f, 0.10f, 0.14f, 1f);
+            _theme.shellOverlay = new Color(0.11f, 0.14f, 0.20f, 0.96f);
+            _theme.surfacePrimary = new Color(0.12f, 0.15f, 0.22f, 1f);
+            _theme.surfaceSecondary = new Color(0.16f, 0.19f, 0.27f, 1f);
+            _theme.surfaceTertiary = new Color(0.17f, 0.26f, 0.42f, 1f);
+            _theme.inkPrimary = Color.white;
+            _theme.inkSecondary = new Color(0.88f, 0.92f, 0.97f, 1f);
+            _theme.inkInverted = Color.white;
+            _theme.accent = new Color(0.50f, 0.74f, 1f, 1f);
+            _theme.accentSoft = new Color(0.20f, 0.26f, 0.38f, 1f);
+            _theme.outline = new Color(0.36f, 0.44f, 0.58f, 1f);
+            _theme.shadow = new Color(0f, 0f, 0f, 0.32f);
+        }
+
         private void RebuildForPreferenceChange()
         {
             if (_canvas != null)
@@ -776,33 +1090,38 @@ namespace Identificaveis
                 Destroy(_canvas.gameObject);
             }
 
+            _theme = IdentificaveisThemeAsset.Load();
+            if (_preferences.highContrast)
+            {
+                ApplyHighContrastPalette();
+            }
+
+            _ui = new IdentificaveisUiFactory(_theme, _font, TextScale);
+            _activeScreen = null;
             BuildUi();
             ShowHome();
         }
 
-        private void ConfigureOptionButton(int index, string label, bool active)
+        private string BuildMonogram(string source)
         {
-            if (index < 0 || index >= _optionButtons.Length)
+            if (string.IsNullOrWhiteSpace(source))
             {
-                return;
+                return "?";
             }
 
-            _optionButtons[index].gameObject.SetActive(active);
-            if (active)
+            string cleaned = source.Replace("@", string.Empty).Trim();
+            if (cleaned.Length == 1)
             {
-                _optionLabels[index].text = label;
+                return cleaned.Substring(0, 1).ToUpperInvariant();
             }
-        }
 
-        private void SetOptionInteractable(bool interactable)
-        {
-            for (int i = 0; i < _optionButtons.Length; i++)
+            string[] parts = cleaned.Split(new[] { ' ', '_', '-', '.', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length >= 2)
             {
-                if (_optionButtons[i] != null)
-                {
-                    _optionButtons[i].interactable = interactable;
-                }
+                return (parts[0][0].ToString() + parts[1][0].ToString()).ToUpperInvariant();
             }
+
+            return cleaned.Substring(0, Mathf.Min(2, cleaned.Length)).ToUpperInvariant();
         }
 
         private void EnsureEventSystem()
@@ -831,182 +1150,6 @@ namespace Identificaveis
             }
 
             return Font.CreateDynamicFontFromOSFont("Arial", 16);
-        }
-
-        private GameObject CreateStretchPanel(string name, Transform parent, Color color)
-        {
-            GameObject panel = new GameObject(name, typeof(RectTransform), typeof(Image));
-            panel.transform.SetParent(parent, false);
-
-            RectTransform rect = panel.GetComponent<RectTransform>();
-            rect.anchorMin = Vector2.zero;
-            rect.anchorMax = Vector2.one;
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-
-            Image image = panel.GetComponent<Image>();
-            image.color = color;
-            return panel;
-        }
-
-        private RectTransform CreateVerticalLayout(Transform parent, Vector2 padding, float spacing, TextAnchor alignment)
-        {
-            GameObject go = new GameObject("Layout", typeof(RectTransform));
-            go.transform.SetParent(parent, false);
-            RectTransform rect = go.GetComponent<RectTransform>();
-
-            VerticalLayoutGroup layout = go.AddComponent<VerticalLayoutGroup>();
-            layout.padding = new RectOffset(Mathf.RoundToInt(padding.x), Mathf.RoundToInt(padding.x), Mathf.RoundToInt(padding.y), Mathf.RoundToInt(padding.y));
-            layout.spacing = spacing;
-            layout.childAlignment = alignment;
-            layout.childControlHeight = true;
-            layout.childControlWidth = true;
-            layout.childForceExpandHeight = false;
-            layout.childForceExpandWidth = true;
-
-            ContentSizeFitter fitter = go.AddComponent<ContentSizeFitter>();
-            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
-
-            return rect;
-        }
-
-        private GameObject CreateCard(string name, Transform parent, Color color)
-        {
-            GameObject go = new GameObject(name, typeof(RectTransform), typeof(Image));
-            go.transform.SetParent(parent, false);
-            Image image = go.GetComponent<Image>();
-            image.color = color;
-            LayoutElement element = go.AddComponent<LayoutElement>();
-            element.minHeight = 240f;
-            return go;
-        }
-
-        private void CreateScrollArea(Transform parent, out RectTransform content, Color backgroundColor)
-        {
-            GameObject root = new GameObject("ScrollRoot", typeof(RectTransform));
-            root.transform.SetParent(parent, false);
-            Stretch(root.GetComponent<RectTransform>(), new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 0f), new Vector2(0f, 0f));
-
-            GameObject viewport = new GameObject("Viewport", typeof(RectTransform), typeof(Image), typeof(Mask));
-            viewport.transform.SetParent(root.transform, false);
-            RectTransform viewportRect = viewport.GetComponent<RectTransform>();
-            Stretch(viewportRect, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 0f), new Vector2(0f, 0f));
-            Image viewportImage = viewport.GetComponent<Image>();
-            viewportImage.color = backgroundColor;
-            viewport.GetComponent<Mask>().showMaskGraphic = false;
-
-            GameObject contentGo = new GameObject("Content", typeof(RectTransform));
-            contentGo.transform.SetParent(viewport.transform, false);
-            content = contentGo.GetComponent<RectTransform>();
-            content.anchorMin = new Vector2(0f, 1f);
-            content.anchorMax = new Vector2(1f, 1f);
-            content.pivot = new Vector2(0.5f, 1f);
-            content.anchoredPosition = Vector2.zero;
-            content.sizeDelta = new Vector2(0f, 0f);
-
-            VerticalLayoutGroup layout = contentGo.AddComponent<VerticalLayoutGroup>();
-            layout.padding = new RectOffset(36, 36, 36, 36);
-            layout.spacing = 24;
-            layout.childControlHeight = true;
-            layout.childControlWidth = true;
-            layout.childForceExpandHeight = false;
-            layout.childForceExpandWidth = true;
-
-            ContentSizeFitter fitter = contentGo.AddComponent<ContentSizeFitter>();
-            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
-
-            ScrollRect scroll = root.AddComponent<ScrollRect>();
-            scroll.viewport = viewportRect;
-            scroll.content = content;
-            scroll.horizontal = false;
-            scroll.vertical = true;
-            scroll.scrollSensitivity = 24f;
-        }
-
-        private Text CreateText(string name, Transform parent, int size, FontStyle style, TextAnchor anchor, Color color)
-        {
-            GameObject go = new GameObject(name, typeof(RectTransform), typeof(Text));
-            go.transform.SetParent(parent, false);
-            Text text = go.GetComponent<Text>();
-            text.font = _font;
-            text.fontSize = Mathf.RoundToInt(size * TextScale);
-            text.fontStyle = style;
-            text.alignment = anchor;
-            text.color = color;
-            text.horizontalOverflow = HorizontalWrapMode.Wrap;
-            text.verticalOverflow = VerticalWrapMode.Overflow;
-            text.supportRichText = true;
-
-            ContentSizeFitter fitter = go.AddComponent<ContentSizeFitter>();
-            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
-
-            return text;
-        }
-
-        private Button CreateWideButton(Transform parent, string label)
-        {
-            Button button = CreateButtonBase(parent, label, 26, ThemeMuted, ThemeTextPrimary);
-            LayoutElement element = button.gameObject.AddComponent<LayoutElement>();
-            element.minHeight = 110f;
-            return button;
-        }
-
-        private Button CreateActionButton(Transform parent, string label)
-        {
-            Button button = CreateButtonBase(parent, label, 28, ThemeAccent, Color.white);
-            LayoutElement element = button.gameObject.AddComponent<LayoutElement>();
-            element.minHeight = 120f;
-            element.flexibleWidth = 1f;
-            return button;
-        }
-
-        private Button CreateButtonBase(Transform parent, string label, int fontSize, Color background, Color textColor)
-        {
-            GameObject buttonGo = new GameObject(label + "Button", typeof(RectTransform), typeof(Image), typeof(Button));
-            buttonGo.transform.SetParent(parent, false);
-
-            Image image = buttonGo.GetComponent<Image>();
-            image.color = background;
-
-            Button button = buttonGo.GetComponent<Button>();
-            ColorBlock colors = button.colors;
-            colors.normalColor = background;
-            colors.highlightedColor = background * 1.05f;
-            colors.pressedColor = background * 0.95f;
-            colors.selectedColor = background;
-            colors.disabledColor = new Color(background.r, background.g, background.b, 0.45f);
-            button.colors = colors;
-
-            RectTransform rect = buttonGo.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(0f, 110f);
-
-            Text labelText = CreateText("Label", buttonGo.transform, fontSize, FontStyle.Bold, TextAnchor.MiddleCenter, textColor);
-            Stretch(labelText.GetComponent<RectTransform>(), Vector2.zero, Vector2.one, new Vector2(20f, 14f), new Vector2(-20f, -14f));
-            labelText.text = label;
-
-            return button;
-        }
-
-        private void CreateDivider(Transform parent)
-        {
-            GameObject divider = new GameObject("Divider", typeof(RectTransform), typeof(Image));
-            divider.transform.SetParent(parent, false);
-            Image image = divider.GetComponent<Image>();
-            image.color = ThemeMuted * 0.85f;
-            LayoutElement element = divider.AddComponent<LayoutElement>();
-            element.minHeight = 2f;
-            element.preferredHeight = 2f;
-        }
-
-        private void Stretch(RectTransform rect, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax)
-        {
-            rect.anchorMin = anchorMin;
-            rect.anchorMax = anchorMax;
-            rect.offsetMin = offsetMin;
-            rect.offsetMax = offsetMax;
         }
     }
 }
