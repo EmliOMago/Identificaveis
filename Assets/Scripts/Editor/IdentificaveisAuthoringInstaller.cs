@@ -283,6 +283,14 @@ namespace Identificaveis.Editor
         {
             GameObject go = new GameObject(name, typeof(RectTransform), typeof(Text));
             go.transform.SetParent(parent, false);
+
+            RectTransform rect = go.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0f, 0.5f);
+            rect.anchorMax = new Vector2(1f, 0.5f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+
             Text text = go.GetComponent<Text>();
             text.font = GetFont();
             text.fontSize = size;
@@ -292,6 +300,7 @@ namespace Identificaveis.Editor
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Overflow;
             text.supportRichText = true;
+            text.resizeTextForBestFit = false;
             return text;
         }
 
@@ -329,39 +338,18 @@ namespace Identificaveis.Editor
 
         private static Font GetFont()
         {
-            string[] preferredFonts =
+            Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            if (font == null)
             {
-                "Arial",
-                "Segoe UI",
-                "Roboto",
-                "Noto Sans",
-                "Liberation Sans",
-                "DejaVu Sans",
-                "Helvetica"
-            };
-
-            for (int i = 0; i < preferredFonts.Length; i++)
-            {
-                try
-                {
-                    Font font = Font.CreateDynamicFontFromOSFont(preferredFonts[i], 16);
-                    if (font != null)
-                    {
-                        return font;
-                    }
-                }
-                catch
-                {
-                    // Continua tentando outras fontes instaladas no sistema.
-                }
+                font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             }
 
-            return null;
+            return font;
         }
 
         private static Sprite GetUiSprite()
         {
-            return null;
+            return AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
         }
 
         private static void EnsureFolder(string path)
