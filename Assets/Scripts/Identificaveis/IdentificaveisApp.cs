@@ -71,7 +71,7 @@ namespace Identificaveis
         private IdentificaveisStyledButton _resultsSecondaryButton;
         private IdentificaveisStyledButton _resultsTertiaryButton;
 
-        private float TextScale => _preferences != null && _preferences.largeText ? 1.32f : 1.15f;
+        private float TextScale => _preferences != null && _preferences.largeText ? 1.15f : 1f;
 
         private void Awake()
         {
@@ -1140,25 +1140,54 @@ namespace Identificaveis
 
         private Font LoadFont()
         {
-            Font arial = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            if (arial != null)
+            string[] preferredFonts =
             {
-                return arial;
+                "Arial",
+                "Segoe UI",
+                "Roboto",
+                "Noto Sans",
+                "Liberation Sans",
+                "DejaVu Sans",
+                "Helvetica"
+            };
+
+            for (int i = 0; i < preferredFonts.Length; i++)
+            {
+                try
+                {
+                    Font dynamicFont = Font.CreateDynamicFontFromOSFont(preferredFonts[i], 16);
+                    if (dynamicFont != null)
+                    {
+                        return dynamicFont;
+                    }
+                }
+                catch
+                {
+                    // Continua tentando outras fontes instaladas no sistema.
+                }
             }
 
-            Font builtin = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            if (builtin != null)
+            try
             {
-                return builtin;
+                Font fallback = Font.CreateDynamicFontFromOSFont(preferredFonts, 16);
+                if (fallback != null)
+                {
+                    return fallback;
+                }
+            }
+            catch
+            {
+                // Ignora e segue para o último recurso.
             }
 
-            Font osFont = Font.CreateDynamicFontFromOSFont(new[] { "Arial", "Segoe UI", "Tahoma", "Verdana" }, 16);
-            if (osFont != null)
+            try
             {
-                return osFont;
+                return Font.CreateDynamicFontFromOSFont("Arial", 16);
             }
-
-            return Font.CreateDynamicFontFromOSFont("Arial", 16);
+            catch
+            {
+                return new Font();
+            }
         }
     }
 }

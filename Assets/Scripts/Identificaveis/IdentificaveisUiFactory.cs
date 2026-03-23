@@ -354,6 +354,7 @@ namespace Identificaveis
             Image image = tile.GetComponent<Image>();
             if (image != null)
             {
+                EnsureSprite(image);
                 image.color = _theme.surfaceSecondary;
             }
 
@@ -364,13 +365,13 @@ namespace Identificaveis
             if (result.caption != null)
             {
                 result.caption.text = captionText;
-                result.caption.color = _theme.inkSecondary;
+                NormalizeText(result.caption, _theme.smallSize, FontStyle.Bold, _theme.inkSecondary);
             }
 
             if (result.value != null)
             {
                 result.value.text = valueText;
-                result.value.color = _theme.inkPrimary;
+                NormalizeText(result.value, _theme.subtitleSize, FontStyle.Bold, _theme.inkPrimary);
             }
 
             return result;
@@ -382,6 +383,7 @@ namespace Identificaveis
             Image image = chip.GetComponent<Image>();
             if (image != null)
             {
+                EnsureSprite(image);
                 image.color = _theme.accentSoft;
             }
 
@@ -389,10 +391,7 @@ namespace Identificaveis
             if (label != null)
             {
                 label.text = text;
-                label.color = _theme.accent;
-                label.font = _font;
-                label.fontSize = Mathf.RoundToInt(_theme.smallSize * _textScale);
-                label.fontStyle = FontStyle.Bold;
+                NormalizeText(label, _theme.smallSize, FontStyle.Bold, _theme.accent);
             }
 
             return chip;
@@ -531,6 +530,7 @@ namespace Identificaveis
                     break;
             }
 
+            EnsureSprite(refs.background);
             refs.background.color = background;
             ColorBlock colors = refs.button.colors;
             colors.normalColor = background;
@@ -542,18 +542,12 @@ namespace Identificaveis
 
             if (refs.label != null)
             {
-                refs.label.font = _font;
-                refs.label.fontSize = Mathf.RoundToInt(_theme.buttonSize * _textScale);
-                refs.label.fontStyle = FontStyle.Bold;
-                refs.label.color = textColor;
+                NormalizeText(refs.label, _theme.buttonSize, FontStyle.Bold, textColor);
             }
 
             if (refs.badge != null)
             {
-                refs.badge.color = style == IdentificaveisButtonStyle.Primary ? MultiplyAlpha(_theme.inkInverted, 0.9f) : _theme.accent;
-                refs.badge.font = _font;
-                refs.badge.fontSize = Mathf.RoundToInt(_theme.smallSize * _textScale);
-                refs.badge.fontStyle = FontStyle.Bold;
+                NormalizeText(refs.badge, _theme.smallSize, FontStyle.Bold, style == IdentificaveisButtonStyle.Primary ? MultiplyAlpha(_theme.inkInverted, 0.9f) : _theme.accent);
                 refs.badge.gameObject.SetActive(style == IdentificaveisButtonStyle.Choice);
             }
         }
@@ -711,40 +705,43 @@ namespace Identificaveis
 
         private void EnsureSprite(Image image)
         {
-            if (image == null)
+            if (image != null && image.sprite == null)
+            {
+                image.sprite = _uiSprite;
+                image.type = Image.Type.Sliced;
+                image.preserveAspect = false;
+            }
+        }
+
+        private void NormalizeText(Text text, int size, FontStyle style, Color color)
+        {
+            if (text == null)
             {
                 return;
             }
 
-            if (image.sprite == null)
-            {
-                image.sprite = _uiSprite;
-            }
-
-            if (image.sprite != null)
-            {
-                image.type = image.sprite.border.sqrMagnitude > 0f ? Image.Type.Sliced : Image.Type.Simple;
-            }
+            text.font = _font;
+            text.fontSize = Mathf.RoundToInt(size * _textScale);
+            text.fontStyle = style;
+            text.color = color;
+            text.supportRichText = true;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Overflow;
         }
 
         private Sprite CreateUiSprite()
         {
-            const int size = 16;
-            Texture2D texture = NewTexture(size, size);
-            Color white = Color.white;
-            for (int y = 0; y < size; y++)
+            Texture2D texture = NewTexture(3, 3);
+            for (int y = 0; y < 3; y++)
             {
-                for (int x = 0; x < size; x++)
+                for (int x = 0; x < 3; x++)
                 {
-                    texture.SetPixel(x, y, white);
+                    texture.SetPixel(x, y, Color.white);
                 }
             }
 
             texture.Apply(false, true);
-            Sprite sprite = Sprite.Create(texture, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect, new Vector4(4f, 4f, 4f, 4f));
-            sprite.name = texture.name + "_UiFill";
-            sprite.hideFlags = HideFlags.HideAndDontSave;
-            return sprite;
+            return Sprite.Create(texture, new Rect(0f, 0f, 3f, 3f), new Vector2(0.5f, 0.5f), 100f, 0u, SpriteMeshType.FullRect, new Vector4(1f, 1f, 1f, 1f));
         }
 
         private Sprite CreateLogoSprite()
