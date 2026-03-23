@@ -161,10 +161,9 @@ namespace Identificaveis
             _ui.CreateChip(settingsContent, "Ajustes rápidos");
 
             _homeModeLabel = _ui.CreateText("ModeLabel", settingsContent, _theme.bodySize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
-            _homeContrastLabel = _ui.CreateText("ContrastLabel", settingsContent, _theme.bodySize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
             _homeTextSizeLabel = _ui.CreateText("TextLabel", settingsContent, _theme.bodySize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
             Text note = _ui.CreateText("SettingsNote", settingsContent, _theme.smallSize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
-            note.text = "A interface foi organizada para mobile, com hierarquia fixa, áreas amplas de toque e peso visual concentrado no conteúdo, como o GDD pede.";
+            note.text = "Ajuste o modo e o tamanho do texto para deixar a leitura mais confortável.";
 
             GameObject settingsButtons = new GameObject("SettingsButtons", typeof(RectTransform));
             settingsButtons.transform.SetParent(settingsContent, false);
@@ -180,8 +179,6 @@ namespace Identificaveis
 
             IdentificaveisStyledButton modeButton = _ui.CreateButton(settingsButtons.transform, "Alternar modo", IdentificaveisButtonStyle.Secondary);
             modeButton.button.onClick.AddListener(ToggleHardMode);
-            IdentificaveisStyledButton contrastButton = _ui.CreateButton(settingsButtons.transform, "Alternar contraste", IdentificaveisButtonStyle.Secondary);
-            contrastButton.button.onClick.AddListener(ToggleContrast);
             IdentificaveisStyledButton textButton = _ui.CreateButton(settingsButtons.transform, "Alternar tamanho do texto", IdentificaveisButtonStyle.Secondary);
             textButton.button.onClick.AddListener(ToggleTextSize);
 
@@ -201,8 +198,6 @@ namespace Identificaveis
             startButton.button.onClick.AddListener(StartSession);
             IdentificaveisStyledButton tutorialButton = _ui.CreateButton(actionStack.transform, "Como jogar", IdentificaveisButtonStyle.Secondary);
             tutorialButton.button.onClick.AddListener(OpenTutorialFromHome);
-            IdentificaveisStyledButton creditsButton = _ui.CreateButton(actionStack.transform, "Créditos e estrutura", IdentificaveisButtonStyle.Ghost);
-            creditsButton.button.onClick.AddListener(OpenCredits);
 
             return screen;
         }
@@ -218,9 +213,26 @@ namespace Identificaveis
             _messageTitle = _ui.CreateText("MessageTitle", heroContent, _theme.titleSize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
             _messageTitle.text = "Mensagem";
 
-            RectTransform scrollContent = _ui.CreateScrollCard("MessageCard", column, 920f);
-            _messageBody = _ui.CreateText("MessageBody", scrollContent, _theme.bodySize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
+            GameObject bodyCard = _ui.CreateCard("MessageCard", column);
+            LayoutElement bodyLayout = bodyCard.GetComponent<LayoutElement>();
+            if (bodyLayout == null)
+            {
+                bodyLayout = bodyCard.AddComponent<LayoutElement>();
+            }
+
+            bodyLayout.minHeight = 920f;
+            bodyLayout.flexibleHeight = 1f;
+
+            RectTransform bodyContent = _ui.CreateVerticalContent(bodyCard, new Vector2(34f, 34f), 18f, TextAnchor.UpperLeft);
+            _messageBody = _ui.CreateText("MessageBody", bodyContent, _theme.bodySize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
             _messageBody.text = string.Empty;
+            _messageBody.horizontalOverflow = HorizontalWrapMode.Wrap;
+            _messageBody.verticalOverflow = VerticalWrapMode.Overflow;
+            LayoutElement messageBodyLayout = _messageBody.GetComponent<LayoutElement>();
+            if (messageBodyLayout != null)
+            {
+                messageBodyLayout.flexibleHeight = 1f;
+            }
 
             GameObject actions = new GameObject("Actions", typeof(RectTransform));
             actions.transform.SetParent(column, false);
@@ -286,6 +298,7 @@ namespace Identificaveis
             RectTransform avatarTextRect = _avatarMonogram.rectTransform;
             _ui.Stretch(avatarTextRect, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             _avatarMonogram.text = "?";
+            avatarFrame.SetActive(false);
 
             GameObject metaBlock = new GameObject("MetaBlock", typeof(RectTransform));
             metaBlock.transform.SetParent(profileTop.transform, false);
@@ -294,6 +307,7 @@ namespace Identificaveis
             RectTransform metaContent = _ui.CreateVerticalContent(metaBlock, Vector2.zero, 8f, TextAnchor.UpperLeft);
             _avatarDescription = _ui.CreateText("AvatarDescription", metaContent, _theme.smallSize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkSecondary);
             _avatarDescription.text = string.Empty;
+            _avatarDescription.gameObject.SetActive(false);
             _contentHeading = _ui.CreateText("ContentHeading", metaContent, 36, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
             _contentHeading.text = string.Empty;
 
@@ -454,10 +468,8 @@ namespace Identificaveis
         private void OpenCredits()
         {
             ShowMessage(
-                "Créditos e direção",
-                "Conceito, GDD e direção autoral: Emli O'Mago.\n\n" +
-                "Esta versão reorganiza a base em uma linguagem mais editorial e social: hierarquia estável, blocos de leitura, estado visual consistente e componentes reutilizáveis pensados para virar prefabs editáveis no projeto.\n\n" +
-                "A lógica principal continua separada do conteúdo. Perfis e cenários permanecem no JSON, enquanto a camada visual foi preparada para variações futuras de arte e layout.",
+                "Sobre o jogo",
+                "Identificáveis é um jogo curto de leitura social e percepção narrativa.\n\nCada partida propõe observar sinais de humanidade, hesitação, excesso de polimento e reações que parecem reais no contexto.\n\nA melhor experiência é descobrir esses padrões jogando, por isso o menu principal agora vai direto ao que importa.",
                 "Voltar ao início",
                 ShowHome,
                 null,
@@ -533,17 +545,17 @@ namespace Identificaveis
 
         private void RenderProfile(ProfileContentData profile)
         {
-            _phaseLabel.text = "Fase 1 — Quem é?";
+            _phaseLabel.text = "Fase 1 — Quem parece real?";
             _gameTitle.text = profile.username;
-            _gameSubtitle.text = "Julgue o conjunto, não um único sinal isolado.";
+            _gameSubtitle.text = "Leia a bio e a publicação antes de decidir.";
             SetProgress(PhaseType.Profiles, _session.phaseIndex + 1, _session.activeProfiles.Count);
 
             _avatarMonogram.text = BuildMonogram(profile.username);
-            _avatarDescription.text = "Avatar\n" + profile.avatar;
+            _avatarDescription.text = string.Empty;
             _contentHeading.text = profile.bio;
             _readingChip.SetActive(true);
-            _readingChipLabel.text = "Leia os sinais de coerência, ruído, afeto e falha.";
-            _contentBody.text = "POSTAGEM\n\n“" + profile.post + "”";
+            _readingChipLabel.text = "Observe o conjunto: tom, detalhe, falha e naturalidade.";
+            _contentBody.text = "Publicação\n\n\"" + profile.post + "\"";
 
             ConfigureOptionButton(0, "Parece humano", true, "H");
             ConfigureOptionButton(1, "Parece algoritmo", true, "IA");
@@ -552,24 +564,24 @@ namespace Identificaveis
 
             HideFeedback();
             _nextButton.button.gameObject.SetActive(false);
-            _nextButton.label.text = "Próximo";
+            _nextButton.label.text = "Próximo perfil";
             SetOptionInteractable(true);
             _session.waitingForAdvance = false;
         }
 
         private void RenderScenario(ScenarioContentData scenario)
         {
-            _phaseLabel.text = "Fase 2 — O que posta?";
+            _phaseLabel.text = "Fase 2 — Qual reação soa mais humana?";
             _gameTitle.text = scenario.title;
             _gameSubtitle.text = scenario.person;
             SetProgress(PhaseType.Scenarios, _session.phaseIndex + 1, _session.activeScenarios.Count);
 
             _avatarMonogram.text = BuildMonogram(scenario.person);
-            _avatarDescription.text = "Pessoa em foco\n" + scenario.person;
+            _avatarDescription.text = string.Empty;
             _contentHeading.text = scenario.eventText;
             _readingChip.SetActive(true);
-            _readingChipLabel.text = scenario.reading;
-            _contentBody.text = "Escolha a reação que parece mais humana neste contexto. Evite premiar a alternativa mais polida só por ser confortável de ler.";
+            _readingChipLabel.text = "Escolha a reação que parece mais viva e menos montada.";
+            _contentBody.text = "Considere o contexto e escolha a resposta que soa mais humana.";
 
             for (int i = 0; i < _optionButtons.Length; i++)
             {
@@ -778,6 +790,9 @@ namespace Identificaveis
                 _messageSecondaryButton.label.text = secondaryLabel;
             }
 
+            Canvas.ForceUpdateCanvases();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_messageScreen.GetComponent<RectTransform>());
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_messageBody.rectTransform);
             CrossfadeTo(_messageScreen);
         }
 
@@ -991,20 +1006,28 @@ namespace Identificaveis
 
         private string BuildProfileFeedback(ProfileContentData profile, bool correct)
         {
-            string expected = string.Equals(profile.correctType, "humano", StringComparison.OrdinalIgnoreCase) ? "humano" : "algorítmico";
-            return (correct ? "Leitura correta: " : "A leitura correta era ") + expected + ". " + profile.signalKey;
+            bool expectedHuman = string.Equals(profile.correctType, "humano", StringComparison.OrdinalIgnoreCase);
+            if (expectedHuman)
+            {
+                return correct
+                    ? "Leitura correta. O perfil tem ruído, detalhe ou contradição suficientes para soar humano."
+                    : "A leitura correta era humana. Há marcas de improviso, detalhe ou contradição que quebram a sensação de texto pronto.";
+            }
+
+            return correct
+                ? "Leitura correta. O perfil parece montado e liso demais para soar espontâneo."
+                : "A leitura correta era algorítmica. O conjunto soa polido demais e com pouco traço individual.";
         }
 
         private string BuildScenarioFeedback(ScenarioContentData scenario, ScenarioChoiceData picked, ScenarioChoiceData humanChoice, bool correct)
         {
             if (correct)
             {
-                return scenario.reading;
+                return "Leitura registrada. Essa reação parece mais situada no corpo, no instante e na tensão do momento.";
             }
 
             string target = humanChoice != null ? humanChoice.text : "resposta humana não definida";
-            string selected = picked != null ? picked.text : "opção inválida";
-            return "A opção humana era: \"" + target + "\". Você escolheu uma alternativa mais otimizada para parecer boa ou bem resolvida: \"" + selected + "\". " + scenario.reading;
+            return "A reação mais humana era: \"" + target + "\". A alternativa escolhida soa mais organizada, explicativa ou pronta do que a situação pede.";
         }
 
         private void AppendPhaseMistakes(StringBuilder builder, PhaseType phase)
@@ -1034,14 +1057,20 @@ namespace Identificaveis
 
         private string BuildMenuRoundText()
         {
-            return "Partida curta, pensada para 5 a 8 minutos, com " + _database.profilesPerRun + " perfis e " + _database.scenariosPerRun + " cenários por rodada. O peso vem do conteúdo, não da complexidade mecânica.";
+            return "Partida curta, pensada para 5 a 8 minutos, com " + _database.profilesPerRun + " perfis e " + _database.scenariosPerRun + " situações por rodada.";
         }
 
         private void RefreshMenuLabels()
         {
-            _homeModeLabel.text = "Modo: " + (_preferences.hardMode ? "Difícil — feedback ao fim da fase" : "Padrão — feedback item a item");
-            _homeContrastLabel.text = "Contraste: " + (_preferences.highContrast ? "Alto" : "Padrão");
-            _homeTextSizeLabel.text = "Texto: " + (_preferences.largeText ? "Ampliado" : "Padrão");
+            if (_homeModeLabel != null)
+            {
+                _homeModeLabel.text = "Modo: " + (_preferences.hardMode ? "Difícil — feedback ao fim da fase" : "Padrão — feedback a cada escolha");
+            }
+
+            if (_homeTextSizeLabel != null)
+            {
+                _homeTextSizeLabel.text = "Texto: " + (_preferences.largeText ? "Ampliado" : "Padrão");
+            }
         }
 
         private void ToggleHardMode()
