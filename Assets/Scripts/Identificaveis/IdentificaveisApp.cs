@@ -242,24 +242,36 @@ namespace Identificaveis
         private GameObject BuildGameplayScreen(Transform parent)
         {
             GameObject screen = _ui.CreateScreen("GameplayScreen", parent);
-            RectTransform column = _ui.CreateSafeColumn("SafeArea", screen.transform, new Vector2(38f, 38f), 20f);
+            RectTransform column = _ui.CreateSafeColumn("SafeArea", screen.transform, new Vector2(46f, 46f), 28f);
 
             GameObject masthead = _ui.CreateShellCard("Masthead", column);
-            RectTransform mastheadContent = _ui.CreateVerticalContent(masthead, new Vector2(24f, 24f), 14f, TextAnchor.UpperLeft);
+            RectTransform mastheadContent = _ui.CreateVerticalContent(masthead, new Vector2(30f, 30f), 20f, TextAnchor.UpperLeft);
             _ui.CreateChip(mastheadContent, "Identificáveis");
             _phaseLabel = _ui.CreateText("PhaseLabel", mastheadContent, _theme.smallSize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.accent);
             _phaseLabel.text = "Fase";
             _gameTitle = _ui.CreateText("GameTitle", mastheadContent, 38, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
             _gameSubtitle = _ui.CreateText("GameSubtitle", mastheadContent, _theme.bodySize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
+            _gameSubtitle.lineSpacing = 1.12f;
             _progress = _ui.CreateProgressBar(mastheadContent);
 
             GameObject contentCard = _ui.CreateCard("ContentCard", column);
-            RectTransform content = _ui.CreateVerticalContent(contentCard, new Vector2(28f, 28f), 18f, TextAnchor.UpperLeft);
+            LayoutElement contentCardLayout = contentCard.GetComponent<LayoutElement>();
+            if (contentCardLayout == null)
+            {
+                contentCardLayout = contentCard.AddComponent<LayoutElement>();
+            }
+
+            contentCardLayout.minHeight = 980f;
+            contentCardLayout.flexibleHeight = 1f;
+
+            RectTransform content = _ui.CreateVerticalContent(contentCard, new Vector2(36f, 36f), 26f, TextAnchor.UpperLeft);
             _contentHeading = _ui.CreateText("ContentHeading", content, _theme.bodySize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
             _contentHeading.text = string.Empty;
             _contentBody = _ui.CreateText("ContentBody", content, _theme.bodySize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkPrimary);
+            _contentBody.lineSpacing = 1.18f;
             _contentBody.text = string.Empty;
             _readingChip = _ui.CreateChip(content, "Leia antes de decidir");
+            _ui.CreateDivider(content, 0.55f);
             _readingChipLabel = _readingChip.GetComponentInChildren<Text>(true);
 
             _feedbackCard = _ui.CreateCard("FeedbackCard", column, true);
@@ -271,7 +283,7 @@ namespace Identificaveis
             GameObject options = new GameObject("Options", typeof(RectTransform));
             options.transform.SetParent(column, false);
             VerticalLayoutGroup optionsLayout = options.AddComponent<VerticalLayoutGroup>();
-            optionsLayout.spacing = 12f;
+            optionsLayout.spacing = 16f;
             optionsLayout.childAlignment = TextAnchor.UpperCenter;
             optionsLayout.childControlHeight = true;
             optionsLayout.childControlWidth = true;
@@ -295,7 +307,7 @@ namespace Identificaveis
             GameObject footer = new GameObject("Footer", typeof(RectTransform));
             footer.transform.SetParent(column, false);
             HorizontalLayoutGroup footerLayout = footer.AddComponent<HorizontalLayoutGroup>();
-            footerLayout.spacing = 14f;
+            footerLayout.spacing = 18f;
             footerLayout.childAlignment = TextAnchor.MiddleCenter;
             footerLayout.childControlHeight = true;
             footerLayout.childControlWidth = true;
@@ -545,7 +557,7 @@ namespace Identificaveis
             _contentHeading.text = "Perfil";
             _readingChip.SetActive(true);
             _readingChipLabel.text = "Observe bio e publicação antes de escolher.";
-            _contentBody.text = "Bio\n" + profile.bio + "\n\nPublicação\n\u201c" + profile.post + "\u201d";
+            _contentBody.text = "Bio\n\n" + profile.bio + "\n\n\nPublicação\n\n\u201c" + profile.post + "\u201d";
 
             ConfigureOptionButton(0, "Parece humano", true, "H");
             ConfigureOptionButton(1, "Parece algoritmo", true, "IA");
