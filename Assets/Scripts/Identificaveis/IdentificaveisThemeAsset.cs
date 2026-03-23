@@ -32,18 +32,11 @@ namespace Identificaveis
         public float cardRadiusHint = 26f;
         public float transitionDuration = 0.18f;
 
-        private const string ResourcePath = "Identificaveis/IdentificaveisTheme";
-        private static IdentificaveisThemeAsset _source;
-
-        public static IdentificaveisThemeAsset Load()
+        public static IdentificaveisThemeAsset CreateRuntime(IdentificaveisThemeAsset source = null)
         {
-            if (_source == null)
-            {
-                _source = Resources.Load<IdentificaveisThemeAsset>(ResourcePath);
-            }
-
-            IdentificaveisThemeAsset runtime = _source != null ? Instantiate(_source) : CreateInstance<IdentificaveisThemeAsset>();
+            IdentificaveisThemeAsset runtime = source != null ? Instantiate(source) : CreateInstance<IdentificaveisThemeAsset>();
             runtime.name = "IdentificaveisTheme_Runtime";
+            runtime.hideFlags = HideFlags.DontSave;
             return runtime;
         }
     }

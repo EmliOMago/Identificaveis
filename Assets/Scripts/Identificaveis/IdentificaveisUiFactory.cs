@@ -34,8 +34,6 @@ namespace Identificaveis
 
     public sealed class IdentificaveisUiFactory
     {
-        private const string PrefabBasePath = "Identificaveis/Prefabs/";
-
         private readonly IdentificaveisThemeAsset _theme;
         private readonly Font _font;
         private readonly float _textScale;
@@ -57,9 +55,9 @@ namespace Identificaveis
             _font = font;
             _textScale = textScale;
             _uiSprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
-            _logoSprite = Resources.Load<Sprite>("Identificaveis/Sprites/logo_mark");
-            _gridSprite = Resources.Load<Sprite>("Identificaveis/Sprites/soft_grid");
-            _avatarRingSprite = Resources.Load<Sprite>("Identificaveis/Sprites/avatar_ring");
+            _logoSprite = CreateLogoSprite();
+            _gridSprite = CreateGridSprite();
+            _avatarRingSprite = CreateAvatarRingSprite();
         }
 
         public GameObject CreateScreen(string name, Transform parent)
@@ -569,61 +567,31 @@ namespace Identificaveis
 
         private GameObject GetActionButtonPrefab()
         {
-            if (_actionButtonPrefab == null)
-            {
-                _actionButtonPrefab = Resources.Load<GameObject>(PrefabBasePath + "ActionButton");
-            }
-
             return _actionButtonPrefab;
         }
 
         private GameObject GetSecondaryButtonPrefab()
         {
-            if (_secondaryButtonPrefab == null)
-            {
-                _secondaryButtonPrefab = Resources.Load<GameObject>(PrefabBasePath + "SecondaryButton");
-            }
-
             return _secondaryButtonPrefab;
         }
 
         private GameObject GetChoiceButtonPrefab()
         {
-            if (_choiceButtonPrefab == null)
-            {
-                _choiceButtonPrefab = Resources.Load<GameObject>(PrefabBasePath + "ChoiceButton");
-            }
-
             return _choiceButtonPrefab;
         }
 
         private GameObject GetCardPrefab()
         {
-            if (_cardPrefab == null)
-            {
-                _cardPrefab = Resources.Load<GameObject>(PrefabBasePath + "SurfaceCard");
-            }
-
             return _cardPrefab;
         }
 
         private GameObject GetStatTilePrefab()
         {
-            if (_statTilePrefab == null)
-            {
-                _statTilePrefab = Resources.Load<GameObject>(PrefabBasePath + "StatTile");
-            }
-
             return _statTilePrefab;
         }
 
         private GameObject GetChipPrefab()
         {
-            if (_chipPrefab == null)
-            {
-                _chipPrefab = Resources.Load<GameObject>(PrefabBasePath + "Chip");
-            }
-
             return _chipPrefab;
         }
 
@@ -748,6 +716,112 @@ namespace Identificaveis
                 image.sprite = _uiSprite;
                 image.type = Image.Type.Sliced;
             }
+        }
+
+        private Sprite CreateLogoSprite()
+        {
+            const int size = 128;
+            Texture2D texture = NewTexture(size, size);
+            Vector2 center = new Vector2((size - 1) * 0.5f, (size - 1) * 0.5f);
+            float outer = size * 0.36f;
+            float inner = size * 0.18f;
+            float barHalf = size * 0.065f;
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    float dx = x - center.x;
+                    float dy = y - center.y;
+                    float distance = Mathf.Sqrt(dx * dx + dy * dy);
+                    bool ring = distance <= outer && distance >= inner;
+                    bool vertical = Mathf.Abs(dx) <= barHalf && Mathf.Abs(dy) <= outer;
+                    bool horizontal = Mathf.Abs(dy) <= barHalf && Mathf.Abs(dx) <= outer;
+
+                    float alpha = ring ? 0.92f : 0f;
+                    if (vertical || horizontal)
+                    {
+                        alpha = 1f;
+                    }
+
+                    texture.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
+                }
+            }
+
+            texture.Apply(false, true);
+            return MakeSprite(texture);
+        }
+
+        private Sprite CreateGridSprite()
+        {
+            const int size = 64;
+            Texture2D texture = NewTexture(size, size);
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    bool major = x % 16 == 0 || y % 16 == 0;
+                    bool minor = x % 8 == 0 || y % 8 == 0;
+                    float alpha = major ? 0.22f : (minor ? 0.08f : 0f);
+                    texture.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
+                }
+            }
+
+            texture.Apply(false, true);
+            return MakeSprite(texture);
+        }
+
+        private Sprite CreateAvatarRingSprite()
+        {
+            const int size = 128;
+            Texture2D texture = NewTexture(size, size);
+            Vector2 center = new Vector2((size - 1) * 0.5f, (size - 1) * 0.5f);
+            float outer = size * 0.47f;
+            float inner = size * 0.39f;
+            float glow = size * 0.31f;
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    float dx = x - center.x;
+                    float dy = y - center.y;
+                    float distance = Mathf.Sqrt(dx * dx + dy * dy);
+                    float alpha = 0f;
+
+                    if (distance <= outer && distance >= inner)
+                    {
+                        alpha = 1f;
+                    }
+                    else if (distance < inner && distance >= glow)
+                    {
+                        alpha = Mathf.InverseLerp(inner, glow, distance) * 0.18f;
+                    }
+
+                    texture.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
+                }
+            }
+
+            texture.Apply(false, true);
+            return MakeSprite(texture);
+        }
+
+        private static Texture2D NewTexture(int width, int height)
+        {
+            Texture2D texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+            texture.name = "IdentificaveisRuntimeTexture";
+            texture.filterMode = FilterMode.Bilinear;
+            texture.wrapMode = TextureWrapMode.Clamp;
+            texture.hideFlags = HideFlags.HideAndDontSave;
+            return texture;
+        }
+
+        private static Sprite MakeSprite(Texture2D texture)
+        {
+            Sprite sprite = Sprite.Create(texture, new Rect(0f, 0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100f);
+            sprite.name = texture.name + "_Sprite";
+            sprite.hideFlags = HideFlags.HideAndDontSave;
+            return sprite;
         }
 
         private Color MultiplyAlpha(Color color, float alpha)

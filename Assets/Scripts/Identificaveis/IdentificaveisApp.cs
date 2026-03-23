@@ -15,6 +15,9 @@ namespace Identificaveis
         private SessionState _session;
         private SessionAnalysis _analysis;
 
+        [Header("Autorais opcionais")]
+        [SerializeField] private IdentificaveisThemeAsset _themePreset;
+
         private Font _font;
         private IdentificaveisUiFactory _ui;
 
@@ -73,7 +76,7 @@ namespace Identificaveis
         private void Awake()
         {
             _database = IdentificaveisContentRepository.Load();
-            _theme = IdentificaveisThemeAsset.Load();
+            _theme = IdentificaveisThemeAsset.CreateRuntime(_themePreset);
             _preferences = IdentificaveisPreferencesStore.LoadPreferences();
             if (_preferences != null && _preferences.highContrast)
             {
@@ -1090,7 +1093,7 @@ namespace Identificaveis
                 Destroy(_canvas.gameObject);
             }
 
-            _theme = IdentificaveisThemeAsset.Load();
+            _theme = IdentificaveisThemeAsset.CreateRuntime(_themePreset);
             if (_preferences.highContrast)
             {
                 ApplyHighContrastPalette();

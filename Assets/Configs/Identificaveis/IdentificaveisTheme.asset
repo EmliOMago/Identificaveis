@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 297f672aca53c69408be64184032972b, type: 3}
+  m_Name: IdentificaveisTheme
+  m_EditorClassIdentifier: 
+  backgroundTop: {r: 0.96, g: 0.97, b: 0.99, a: 1}
+  backgroundBottom: {r: 0.91, g: 0.94, b: 0.98, a: 1}
+  shellOverlay: {r: 1, g: 1, b: 1, a: 0.66}
+  surfacePrimary: {r: 1, g: 1, b: 1, a: 1}
+  surfaceSecondary: {r: 0.92, g: 0.94, b: 0.98, a: 1}
+  surfaceTertiary: {r: 0.14, g: 0.19, b: 0.29, a: 1}
+  outline: {r: 0.74, g: 0.79, b: 0.88, a: 1}
+  inkPrimary: {r: 0.1, g: 0.15, b: 0.24, a: 1}
+  inkSecondary: {r: 0.34, g: 0.39, b: 0.49, a: 1}
+  inkInverted: {r: 1, g: 1, b: 1, a: 1}
+  accent: {r: 0.18, g: 0.35, b: 0.67, a: 1}
+  accentSoft: {r: 0.84, g: 0.89, b: 0.98, a: 1}
+  success: {r: 0.17, g: 0.62, b: 0.36, a: 1}
+  error: {r: 0.8, g: 0.24, b: 0.26, a: 1}
+  warning: {r: 0.8, g: 0.58, b: 0.2, a: 1}
+  shadow: {r: 0.09, g: 0.13, b: 0.2, a: 0.18}
+  titleSize: 62
+  subtitleSize: 28
+  bodySize: 26
+  smallSize: 22
+  buttonSize: 28
+  sectionSpacing: 24
+  cardRadiusHint: 26
+  transitionDuration: 0.18

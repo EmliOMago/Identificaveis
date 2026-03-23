@@ -4,7 +4,8 @@ namespace Identificaveis
 {
     public static class IdentificaveisContentRepository
     {
-        private const string ResourcePath = "Identificaveis/default_content";
+        private const string PrimaryResourcePath = "Dados/Identificaveis/default_content";
+        private const string LegacyResourcePath = "Identificaveis/default_content";
         private static IdentificaveisContentDatabase _cached;
 
         public static IdentificaveisContentDatabase Load()
@@ -14,10 +15,15 @@ namespace Identificaveis
                 return _cached;
             }
 
-            TextAsset asset = Resources.Load<TextAsset>(ResourcePath);
+            TextAsset asset = Resources.Load<TextAsset>(PrimaryResourcePath);
             if (asset == null)
             {
-                Debug.LogError("[Identificáveis] Arquivo de conteúdo não encontrado em Resources/" + ResourcePath + ".json");
+                asset = Resources.Load<TextAsset>(LegacyResourcePath);
+            }
+
+            if (asset == null)
+            {
+                Debug.LogError("[Identificáveis] Arquivo de conteúdo não encontrado em Resources/" + PrimaryResourcePath + ".json ou Resources/" + LegacyResourcePath + ".json");
                 _cached = new IdentificaveisContentDatabase();
                 return _cached;
             }
@@ -38,6 +44,7 @@ namespace Identificaveis
             {
                 _cached.scenarios = new System.Collections.Generic.List<ScenarioContentData>();
             }
+
             return _cached;
         }
     }

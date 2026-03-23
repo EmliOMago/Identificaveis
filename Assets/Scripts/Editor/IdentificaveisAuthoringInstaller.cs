@@ -9,17 +9,25 @@ namespace Identificaveis.Editor
     [InitializeOnLoad]
     public static class IdentificaveisAuthoringInstaller
     {
-        private const string ResourcesRoot = "Assets/Resources/Identificaveis";
-        private const string PrefabsRoot = ResourcesRoot + "/Prefabs";
-        private const string SpritesRoot = ResourcesRoot + "/Sprites";
-        private const string ThemeAssetPath = ResourcesRoot + "/IdentificaveisTheme.asset";
+        private const string LegacyResourcesRoot = "Assets/Resources/Identificaveis";
+        private const string LegacyPrefabsRoot = LegacyResourcesRoot + "/Prefabs";
+        private const string LegacySpritesRoot = LegacyResourcesRoot + "/Sprites";
+        private const string LegacyThemeAssetPath = LegacyResourcesRoot + "/IdentificaveisTheme.asset";
+        private const string LegacyDataPath = LegacyResourcesRoot + "/default_content.json";
+
+        private const string DataRoot = "Assets/Resources/Dados/Identificaveis";
+        private const string DataPath = DataRoot + "/default_content.json";
+        private const string PrefabsRoot = "Assets/Prefabs/Identificaveis";
+        private const string SpritesRoot = "Assets/Art/Identificaveis/Sprites";
+        private const string ThemeRoot = "Assets/Configs/Identificaveis";
+        private const string ThemeAssetPath = ThemeRoot + "/IdentificaveisTheme.asset";
 
         static IdentificaveisAuthoringInstaller()
         {
             EditorApplication.delayCall += TryInstall;
         }
 
-        [MenuItem("Identificaveis/Regenerar prefabs de UI")]
+        [MenuItem("Identificaveis/Reorganizar assets autorais")]
         public static void ForceInstall()
         {
             Install(force: true);
@@ -38,9 +46,27 @@ namespace Identificaveis.Editor
         private static void Install(bool force)
         {
             EnsureFolder("Assets/Resources");
-            EnsureFolder(ResourcesRoot);
+            EnsureFolder("Assets/Resources/Dados");
+            EnsureFolder(DataRoot);
+            EnsureFolder("Assets/Prefabs");
             EnsureFolder(PrefabsRoot);
+            EnsureFolder("Assets/Art");
+            EnsureFolder("Assets/Art/Identificaveis");
             EnsureFolder(SpritesRoot);
+            EnsureFolder("Assets/Configs");
+            EnsureFolder(ThemeRoot);
+
+            MoveIfNeeded(LegacyDataPath, DataPath);
+            MoveIfNeeded(LegacyThemeAssetPath, ThemeAssetPath);
+            MoveIfNeeded(LegacyPrefabsRoot + "/ActionButton.prefab", PrefabsRoot + "/ActionButton.prefab");
+            MoveIfNeeded(LegacyPrefabsRoot + "/SecondaryButton.prefab", PrefabsRoot + "/SecondaryButton.prefab");
+            MoveIfNeeded(LegacyPrefabsRoot + "/ChoiceButton.prefab", PrefabsRoot + "/ChoiceButton.prefab");
+            MoveIfNeeded(LegacyPrefabsRoot + "/SurfaceCard.prefab", PrefabsRoot + "/SurfaceCard.prefab");
+            MoveIfNeeded(LegacyPrefabsRoot + "/StatTile.prefab", PrefabsRoot + "/StatTile.prefab");
+            MoveIfNeeded(LegacyPrefabsRoot + "/Chip.prefab", PrefabsRoot + "/Chip.prefab");
+            MoveIfNeeded(LegacySpritesRoot + "/logo_mark.png", SpritesRoot + "/logo_mark.png");
+            MoveIfNeeded(LegacySpritesRoot + "/soft_grid.png", SpritesRoot + "/soft_grid.png");
+            MoveIfNeeded(LegacySpritesRoot + "/avatar_ring.png", SpritesRoot + "/avatar_ring.png");
 
             ConfigureSpriteImporter(SpritesRoot + "/logo_mark.png");
             ConfigureSpriteImporter(SpritesRoot + "/soft_grid.png");
@@ -54,8 +80,53 @@ namespace Identificaveis.Editor
             EnsurePrefab(PrefabsRoot + "/StatTile.prefab", CreateStatTilePrefab, force);
             EnsurePrefab(PrefabsRoot + "/Chip.prefab", CreateChipPrefab, force);
 
+            DeleteFolderIfEmpty(LegacyPrefabsRoot);
+            DeleteFolderIfEmpty(LegacySpritesRoot);
+            DeleteFolderIfEmpty(LegacyResourcesRoot);
+
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+        }
+
+        private static void MoveIfNeeded(string oldPath, string newPath)
+        {
+            if (!AssetExists(oldPath))
+            {
+                return;
+            }
+
+            if (AssetExists(newPath))
+            {
+                AssetDatabase.DeleteAsset(oldPath);
+                return;
+            }
+
+            string directory = Path.GetDirectoryName(newPath).Replace("\\", "/");
+            EnsureFolder(directory);
+            string error = AssetDatabase.MoveAsset(oldPath, newPath);
+            if (!string.IsNullOrEmpty(error))
+            {
+                Debug.LogWarning("[Identificáveis] Não foi possível mover asset para a nova pasta: " + error);
+            }
+        }
+
+        private static bool AssetExists(string path)
+        {
+            return AssetDatabase.LoadMainAssetAtPath(path) != null || File.Exists(path) || Directory.Exists(path);
+        }
+
+        private static void DeleteFolderIfEmpty(string path)
+        {
+            if (!AssetDatabase.IsValidFolder(path))
+            {
+                return;
+            }
+
+            string[] assets = AssetDatabase.FindAssets(string.Empty, new[] { path });
+            if (assets.Length == 0)
+            {
+                AssetDatabase.DeleteAsset(path);
+            }
         }
 
         private static void EnsureThemeAsset(bool force)
@@ -244,7 +315,7 @@ namespace Identificaveis.Editor
                 changed = true;
             }
 
-            if (importer.alphaIsTransparency != true)
+            if (!importer.alphaIsTransparency)
             {
                 importer.alphaIsTransparency = true;
                 changed = true;
