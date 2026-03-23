@@ -139,7 +139,7 @@ namespace Identificaveis
                 ? "Observe perfis e reações. Tente perceber o que soa humano de verdade."
                 : _database.subtitle;
 
-            _homeRoundLabel = _ui.CreateText("RoundLabel", heroContent, _theme.smallSize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
+            _homeRoundLabel = _ui.CreateText("RoundLabel", heroContent, _theme.bodySize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
             _homeRoundLabel.text = BuildMenuRoundText();
 
             GameObject statsRow = new GameObject("StatsRow", typeof(RectTransform));
@@ -242,16 +242,41 @@ namespace Identificaveis
         private GameObject BuildGameplayScreen(Transform parent)
         {
             GameObject screen = _ui.CreateScreen("GameplayScreen", parent);
-            RectTransform column = _ui.CreateSafeColumn("SafeArea", screen.transform, new Vector2(28f, 28f), 18f);
+
+            GameObject safeArea = new GameObject("SafeArea", typeof(RectTransform));
+            safeArea.transform.SetParent(screen.transform, false);
+            RectTransform column = safeArea.GetComponent<RectTransform>();
+            column.anchorMin = Vector2.zero;
+            column.anchorMax = Vector2.one;
+            column.pivot = new Vector2(0.5f, 0.5f);
+            column.offsetMin = new Vector2(34f, 22f);
+            column.offsetMax = new Vector2(-34f, -22f);
+
+            VerticalLayoutGroup columnLayout = safeArea.AddComponent<VerticalLayoutGroup>();
+            columnLayout.padding = new RectOffset(0, 0, 18, 18);
+            columnLayout.spacing = 12f;
+            columnLayout.childAlignment = TextAnchor.UpperCenter;
+            columnLayout.childControlHeight = true;
+            columnLayout.childControlWidth = true;
+            columnLayout.childForceExpandHeight = false;
+            columnLayout.childForceExpandWidth = true;
 
             GameObject masthead = _ui.CreateShellCard("Masthead", column);
-            RectTransform mastheadContent = _ui.CreateVerticalContent(masthead, new Vector2(22f, 22f), 12f, TextAnchor.UpperLeft);
+            LayoutElement mastheadLayout = masthead.GetComponent<LayoutElement>();
+            if (mastheadLayout == null)
+            {
+                mastheadLayout = masthead.AddComponent<LayoutElement>();
+            }
+
+            mastheadLayout.minHeight = 160f;
+            mastheadLayout.flexibleHeight = 0f;
+            RectTransform mastheadContent = _ui.CreateVerticalContent(masthead, new Vector2(28f, 24f), 12f, TextAnchor.UpperLeft);
             _ui.CreateChip(mastheadContent, "Identificáveis");
             _phaseLabel = _ui.CreateText("PhaseLabel", mastheadContent, _theme.smallSize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.accent);
             _phaseLabel.text = "Fase";
-            _gameTitle = _ui.CreateText("GameTitle", mastheadContent, 38, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
+            _gameTitle = _ui.CreateText("GameTitle", mastheadContent, 30, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
             _gameSubtitle = _ui.CreateText("GameSubtitle", mastheadContent, _theme.bodySize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
-            _gameSubtitle.lineSpacing = 1.12f;
+            _gameSubtitle.lineSpacing = 1.08f;
             _progress = _ui.CreateProgressBar(mastheadContent);
 
             GameObject contentCard = _ui.CreateCard("ContentCard", column);
@@ -261,29 +286,52 @@ namespace Identificaveis
                 contentCardLayout = contentCard.AddComponent<LayoutElement>();
             }
 
-            contentCardLayout.minHeight = 0f;
-            contentCardLayout.flexibleHeight = 0f;
+            contentCardLayout.minHeight = 220f;
+            contentCardLayout.preferredHeight = 300f;
+            contentCardLayout.flexibleHeight = 1f;
 
-            RectTransform content = _ui.CreateVerticalContent(contentCard, new Vector2(24f, 24f), 16f, TextAnchor.UpperLeft);
+            RectTransform content = _ui.CreateVerticalContent(contentCard, new Vector2(28f, 24f), 14f, TextAnchor.UpperLeft);
             _contentHeading = _ui.CreateText("ContentHeading", content, _theme.bodySize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
             _contentHeading.text = string.Empty;
             _contentBody = _ui.CreateText("ContentBody", content, _theme.bodySize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkPrimary);
-            _contentBody.lineSpacing = 1.18f;
+            _contentBody.lineSpacing = 1.12f;
             _contentBody.text = string.Empty;
+            LayoutElement contentBodyLayout = _contentBody.GetComponent<LayoutElement>();
+            if (contentBodyLayout != null)
+            {
+                contentBodyLayout.flexibleHeight = 0f;
+            }
+
             _readingChip = _ui.CreateChip(content, "Leia antes de decidir");
+            LayoutElement readingChipLayout = _readingChip.GetComponent<LayoutElement>();
+            if (readingChipLayout == null)
+            {
+                readingChipLayout = _readingChip.AddComponent<LayoutElement>();
+            }
+
+            readingChipLayout.flexibleHeight = 0f;
             _ui.CreateDivider(content, 0.55f);
             _readingChipLabel = _readingChip.GetComponentInChildren<Text>(true);
 
             _feedbackCard = _ui.CreateCard("FeedbackCard", column, true);
+            LayoutElement feedbackLayout = _feedbackCard.GetComponent<LayoutElement>();
+            if (feedbackLayout == null)
+            {
+                feedbackLayout = _feedbackCard.AddComponent<LayoutElement>();
+            }
+
+            feedbackLayout.flexibleHeight = 0f;
             _feedbackCard.SetActive(false);
-            RectTransform feedbackContent = _ui.CreateVerticalContent(_feedbackCard, new Vector2(22f, 22f), 10f, TextAnchor.UpperLeft);
+            RectTransform feedbackContent = _ui.CreateVerticalContent(_feedbackCard, new Vector2(18f, 18f), 8f, TextAnchor.UpperLeft);
             _feedbackTitle = _ui.CreateText("FeedbackTitle", feedbackContent, _theme.bodySize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkInverted);
             _feedbackBody = _ui.CreateText("FeedbackBody", feedbackContent, _theme.smallSize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkInverted);
 
             GameObject options = new GameObject("Options", typeof(RectTransform));
             options.transform.SetParent(column, false);
+            LayoutElement optionsContainerLayout = options.AddComponent<LayoutElement>();
+            optionsContainerLayout.flexibleHeight = 0f;
             VerticalLayoutGroup optionsLayout = options.AddComponent<VerticalLayoutGroup>();
-            optionsLayout.spacing = 12f;
+            optionsLayout.spacing = 10f;
             optionsLayout.childAlignment = TextAnchor.UpperCenter;
             optionsLayout.childControlHeight = true;
             optionsLayout.childControlWidth = true;
@@ -306,6 +354,8 @@ namespace Identificaveis
 
             GameObject footer = new GameObject("Footer", typeof(RectTransform));
             footer.transform.SetParent(column, false);
+            LayoutElement footerContainerLayout = footer.AddComponent<LayoutElement>();
+            footerContainerLayout.flexibleHeight = 0f;
             HorizontalLayoutGroup footerLayout = footer.AddComponent<HorizontalLayoutGroup>();
             footerLayout.spacing = 12f;
             footerLayout.childAlignment = TextAnchor.MiddleCenter;
@@ -569,7 +619,7 @@ namespace Identificaveis
             _nextButton.label.text = "Próximo";
             SetOptionInteractable(true);
             _session.waitingForAdvance = false;
-            ForceGameplayLayout();
+            RebuildGameplayLayout();
         }
 
         private void RenderPrompt(PhaseType phase, ScenarioContentData prompt)
@@ -583,8 +633,6 @@ namespace Identificaveis
             _readingChip.SetActive(true);
             _readingChipLabel.text = GetReadingChipText(phase);
             _contentBody.text = prompt.eventText;
-
-            ForceGameplayLayout();
 
             System.Array.Clear(_displayedScenarioChoices, 0, _displayedScenarioChoices.Length);
             var options = new System.Collections.Generic.List<ScenarioChoiceData>();
@@ -614,6 +662,7 @@ namespace Identificaveis
             _nextButton.label.text = GetAdvanceLabel(phase);
             SetOptionInteractable(true);
             _session.waitingForAdvance = false;
+            RebuildGameplayLayout();
         }
 
         private void OnOptionPressed(int optionIndex)
@@ -780,6 +829,7 @@ namespace Identificaveis
 
         private void ShowGameplay()
         {
+            RebuildGameplayLayout();
             CrossfadeTo(_gameplayScreen);
         }
 
@@ -787,6 +837,26 @@ namespace Identificaveis
         {
             RefreshResults();
             CrossfadeTo(_resultsScreen);
+        }
+
+        private void RebuildGameplayLayout()
+        {
+            if (_gameplayScreen == null)
+            {
+                return;
+            }
+
+            Canvas.ForceUpdateCanvases();
+            RectTransform gameplayRect = _gameplayScreen.GetComponent<RectTransform>();
+            if (gameplayRect != null)
+            {
+                LayoutRebuilder.ForceRebuildLayoutImmediate(gameplayRect);
+            }
+
+            if (_contentBody != null)
+            {
+                LayoutRebuilder.ForceRebuildLayoutImmediate(_contentBody.rectTransform);
+            }
         }
 
         private void ShowMessage(string title, string body, string primaryLabel, Action primaryAction, string secondaryLabel, Action secondaryAction)
@@ -896,6 +966,7 @@ namespace Identificaveis
 
             _feedbackTitle.text = title;
             _feedbackBody.text = body;
+            RebuildGameplayLayout();
         }
 
         private void HideFeedback()
@@ -903,6 +974,7 @@ namespace Identificaveis
             _feedbackCard.SetActive(false);
             _feedbackTitle.text = string.Empty;
             _feedbackBody.text = string.Empty;
+            RebuildGameplayLayout();
         }
 
         private void ConfigureOptionButton(int index, string label, bool active, string badge)
@@ -934,16 +1006,6 @@ namespace Identificaveis
             }
         }
 
-        private void ForceGameplayLayout()
-        {
-            if (_gameplayScreen == null)
-            {
-                return;
-            }
-
-            Canvas.ForceUpdateCanvases();
-            LayoutRebuilder.ForceRebuildLayoutImmediate(_gameplayScreen.GetComponent<RectTransform>());
-        }
 
         private bool IsPromptPhase(PhaseType phase)
         {
@@ -1240,7 +1302,7 @@ namespace Identificaveis
         private string BuildMenuRoundText()
         {
             int total = _database.profilesPerRun + _database.reactionsPerRun + _database.commentsPerRun + _database.messagesPerRun + _database.justificationsPerRun;
-            return "Cada rodada tem " + total + " leituras e costuma durar entre 5 e 8 minutos.";
+            return "Cada rodada atravessa 5 fases e " + total + " leituras. Uma partida costuma durar de 5 a 8 minutos.";
         }
 
         private void RefreshMenuLabels()
