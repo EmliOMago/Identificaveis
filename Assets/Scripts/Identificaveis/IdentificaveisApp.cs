@@ -71,7 +71,7 @@ namespace Identificaveis
         private IdentificaveisStyledButton _resultsSecondaryButton;
         private IdentificaveisStyledButton _resultsTertiaryButton;
 
-        private float TextScale => _preferences != null && _preferences.largeText ? 1.15f : 1f;
+        private float TextScale => _preferences != null && _preferences.largeText ? 1.32f : 1.15f;
 
         private void Awake()
         {
@@ -1140,16 +1140,22 @@ namespace Identificaveis
 
         private Font LoadFont()
         {
+            Font arial = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            if (arial != null)
+            {
+                return arial;
+            }
+
             Font builtin = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             if (builtin != null)
             {
                 return builtin;
             }
 
-            Font arial = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            if (arial != null)
+            Font osFont = Font.CreateDynamicFontFromOSFont(new[] { "Arial", "Segoe UI", "Tahoma", "Verdana" }, 16);
+            if (osFont != null)
             {
-                return arial;
+                return osFont;
             }
 
             return Font.CreateDynamicFontFromOSFont("Arial", 16);

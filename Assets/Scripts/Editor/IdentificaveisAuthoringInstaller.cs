@@ -198,7 +198,10 @@ namespace Identificaveis.Editor
             GameObject root = new GameObject("SurfaceCard", typeof(RectTransform), typeof(Image), typeof(LayoutElement), typeof(Shadow));
             Image image = root.GetComponent<Image>();
             image.sprite = GetUiSprite();
-            image.type = Image.Type.Sliced;
+            if (image.sprite != null)
+            {
+                image.type = Image.Type.Sliced;
+            }
             image.color = Color.white;
             LayoutElement element = root.GetComponent<LayoutElement>();
             element.minHeight = 120f;
@@ -213,7 +216,10 @@ namespace Identificaveis.Editor
             GameObject root = new GameObject("StatTile", typeof(RectTransform), typeof(Image), typeof(LayoutElement));
             Image image = root.GetComponent<Image>();
             image.sprite = GetUiSprite();
-            image.type = Image.Type.Sliced;
+            if (image.sprite != null)
+            {
+                image.type = Image.Type.Sliced;
+            }
             LayoutElement element = root.GetComponent<LayoutElement>();
             element.minHeight = 136f;
             element.flexibleWidth = 1f;
@@ -242,7 +248,10 @@ namespace Identificaveis.Editor
             GameObject root = new GameObject("Chip", typeof(RectTransform), typeof(Image), typeof(LayoutElement), typeof(HorizontalLayoutGroup), typeof(ContentSizeFitter));
             Image image = root.GetComponent<Image>();
             image.sprite = GetUiSprite();
-            image.type = Image.Type.Sliced;
+            if (image.sprite != null)
+            {
+                image.type = Image.Type.Sliced;
+            }
             LayoutElement element = root.GetComponent<LayoutElement>();
             element.minHeight = 60f;
             HorizontalLayoutGroup layout = root.GetComponent<HorizontalLayoutGroup>();
@@ -265,7 +274,10 @@ namespace Identificaveis.Editor
             GameObject root = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button), typeof(LayoutElement));
             Image image = root.GetComponent<Image>();
             image.sprite = GetUiSprite();
-            image.type = Image.Type.Sliced;
+            if (image.sprite != null)
+            {
+                image.type = Image.Type.Sliced;
+            }
             LayoutElement element = root.GetComponent<LayoutElement>();
             element.minHeight = minHeight;
             element.flexibleWidth = 1f;
@@ -329,10 +341,15 @@ namespace Identificaveis.Editor
 
         private static Font GetFont()
         {
-            Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            Font font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             if (font == null)
             {
-                font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+                font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            }
+
+            if (font == null)
+            {
+                font = Font.CreateDynamicFontFromOSFont(new[] { "Arial", "Segoe UI", "Tahoma", "Verdana" }, 16);
             }
 
             return font;
@@ -340,7 +357,7 @@ namespace Identificaveis.Editor
 
         private static Sprite GetUiSprite()
         {
-            return AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+            return null;
         }
 
         private static void EnsureFolder(string path)

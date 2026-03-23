@@ -54,7 +54,7 @@ namespace Identificaveis
             _theme = theme;
             _font = font;
             _textScale = textScale;
-            _uiSprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
+            _uiSprite = CreateUiSprite();
             _logoSprite = CreateLogoSprite();
             _gridSprite = CreateGridSprite();
             _avatarRingSprite = CreateAvatarRingSprite();
@@ -711,11 +711,40 @@ namespace Identificaveis
 
         private void EnsureSprite(Image image)
         {
-            if (image != null && image.sprite == null)
+            if (image == null)
+            {
+                return;
+            }
+
+            if (image.sprite == null)
             {
                 image.sprite = _uiSprite;
-                image.type = Image.Type.Sliced;
             }
+
+            if (image.sprite != null)
+            {
+                image.type = image.sprite.border.sqrMagnitude > 0f ? Image.Type.Sliced : Image.Type.Simple;
+            }
+        }
+
+        private Sprite CreateUiSprite()
+        {
+            const int size = 16;
+            Texture2D texture = NewTexture(size, size);
+            Color white = Color.white;
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    texture.SetPixel(x, y, white);
+                }
+            }
+
+            texture.Apply(false, true);
+            Sprite sprite = Sprite.Create(texture, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect, new Vector4(4f, 4f, 4f, 4f));
+            sprite.name = texture.name + "_UiFill";
+            sprite.hideFlags = HideFlags.HideAndDontSave;
+            return sprite;
         }
 
         private Sprite CreateLogoSprite()
