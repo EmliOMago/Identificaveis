@@ -59,6 +59,7 @@ namespace Identificaveis
         private Text _feedbackTitle;
         private Text _feedbackBody;
         private IdentificaveisStyledButton[] _optionButtons = new IdentificaveisStyledButton[4];
+        private readonly ScenarioChoiceData[] _displayedScenarioChoices = new ScenarioChoiceData[4];
         private IdentificaveisStyledButton _nextButton;
         private IdentificaveisStyledButton _leaveButton;
 
@@ -134,7 +135,9 @@ namespace Identificaveis
             _homeTitle.text = string.IsNullOrEmpty(_database.displayName) ? "Identificáveis" : _database.displayName;
 
             _homeSubtitle = _ui.CreateText("HomeSubtitle", heroContent, _theme.subtitleSize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
-            _homeSubtitle.text = string.IsNullOrEmpty(_database.subtitle) ? "Leia sinais de humanidade, hesite diante do que parece perfeito e descubra por que você errou." : _database.subtitle;
+            _homeSubtitle.text = string.IsNullOrEmpty(_database.subtitle)
+                ? "Observe perfis e reações. Tente perceber o que soa humano de verdade."
+                : _database.subtitle;
 
             _homeRoundLabel = _ui.CreateText("RoundLabel", heroContent, _theme.bodySize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
             _homeRoundLabel.text = BuildMenuRoundText();
@@ -154,33 +157,16 @@ namespace Identificaveis
 
             _homeBestTile = _ui.CreateStatTile(statsRow.transform, "Melhor", "0/0");
             _homePlayedTile = _ui.CreateStatTile(statsRow.transform, "Partidas", "0");
-            _homeFormatTile = _ui.CreateStatTile(statsRow.transform, "Formato", "0+0");
+            _homeFormatTile = _ui.CreateStatTile(statsRow.transform, "Rodada", "0+0");
 
-            GameObject settingsCard = _ui.CreateCard("SettingsCard", column);
-            RectTransform settingsContent = _ui.CreateVerticalContent(settingsCard, new Vector2(28f, 28f), 16f, TextAnchor.UpperLeft);
-            _ui.CreateChip(settingsContent, "Ajustes rápidos");
-
-            _homeModeLabel = _ui.CreateText("ModeLabel", settingsContent, _theme.bodySize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
-            _homeTextSizeLabel = _ui.CreateText("TextLabel", settingsContent, _theme.bodySize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
-            Text note = _ui.CreateText("SettingsNote", settingsContent, _theme.smallSize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
-            note.text = "Ajuste o modo e o tamanho do texto para deixar a leitura mais confortável.";
-
-            GameObject settingsButtons = new GameObject("SettingsButtons", typeof(RectTransform));
-            settingsButtons.transform.SetParent(settingsContent, false);
-            VerticalLayoutGroup settingsButtonsLayout = settingsButtons.AddComponent<VerticalLayoutGroup>();
-            settingsButtonsLayout.spacing = 12f;
-            settingsButtonsLayout.childAlignment = TextAnchor.UpperCenter;
-            settingsButtonsLayout.childControlHeight = true;
-            settingsButtonsLayout.childControlWidth = true;
-            settingsButtonsLayout.childForceExpandHeight = false;
-            settingsButtonsLayout.childForceExpandWidth = true;
-            ContentSizeFitter settingsButtonsFit = settingsButtons.AddComponent<ContentSizeFitter>();
-            settingsButtonsFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-            IdentificaveisStyledButton modeButton = _ui.CreateButton(settingsButtons.transform, "Alternar modo", IdentificaveisButtonStyle.Secondary);
+            GameObject modeCard = _ui.CreateCard("ModeCard", column);
+            RectTransform modeContent = _ui.CreateVerticalContent(modeCard, new Vector2(28f, 28f), 16f, TextAnchor.UpperLeft);
+            _ui.CreateChip(modeContent, "Modo de jogo");
+            _homeModeLabel = _ui.CreateText("ModeLabel", modeContent, _theme.bodySize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
+            Text modeNote = _ui.CreateText("ModeNote", modeContent, _theme.smallSize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
+            modeNote.text = "No modo padrão você recebe feedback logo após cada resposta. No difícil, ele aparece só no fim de cada fase.";
+            IdentificaveisStyledButton modeButton = _ui.CreateButton(modeContent.transform, "Alternar modo", IdentificaveisButtonStyle.Secondary);
             modeButton.button.onClick.AddListener(ToggleHardMode);
-            IdentificaveisStyledButton textButton = _ui.CreateButton(settingsButtons.transform, "Alternar tamanho do texto", IdentificaveisButtonStyle.Secondary);
-            textButton.button.onClick.AddListener(ToggleTextSize);
 
             GameObject actionStack = new GameObject("HomeActions", typeof(RectTransform));
             actionStack.transform.SetParent(column, false);
@@ -263,59 +249,18 @@ namespace Identificaveis
             _ui.CreateChip(mastheadContent, "Identificáveis");
             _phaseLabel = _ui.CreateText("PhaseLabel", mastheadContent, _theme.smallSize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.accent);
             _phaseLabel.text = "Fase";
-            _gameTitle = _ui.CreateText("GameTitle", mastheadContent, 40, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
+            _gameTitle = _ui.CreateText("GameTitle", mastheadContent, 38, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
             _gameSubtitle = _ui.CreateText("GameSubtitle", mastheadContent, _theme.bodySize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
             _progress = _ui.CreateProgressBar(mastheadContent);
 
             GameObject contentCard = _ui.CreateCard("ContentCard", column);
             RectTransform content = _ui.CreateVerticalContent(contentCard, new Vector2(28f, 28f), 18f, TextAnchor.UpperLeft);
-
-            GameObject profileTop = new GameObject("ProfileTop", typeof(RectTransform), typeof(LayoutElement));
-            profileTop.transform.SetParent(content, false);
-            LayoutElement profileTopLayoutElement = profileTop.GetComponent<LayoutElement>();
-            profileTopLayoutElement.flexibleWidth = 1f;
-            HorizontalLayoutGroup profileTopLayout = profileTop.AddComponent<HorizontalLayoutGroup>();
-            profileTopLayout.spacing = 18f;
-            profileTopLayout.childAlignment = TextAnchor.MiddleLeft;
-            profileTopLayout.childControlHeight = true;
-            profileTopLayout.childControlWidth = true;
-            profileTopLayout.childForceExpandHeight = false;
-            profileTopLayout.childForceExpandWidth = false;
-            ContentSizeFitter profileTopFit = profileTop.AddComponent<ContentSizeFitter>();
-            profileTopFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            profileTopFit.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
-
-            GameObject avatarFrame = _ui.CreateCard("AvatarFrame", profileTop.transform);
-            LayoutElement avatarLayout = avatarFrame.GetComponent<LayoutElement>();
-            avatarLayout.minWidth = 120f;
-            avatarLayout.preferredWidth = 120f;
-            avatarLayout.minHeight = 120f;
-            avatarLayout.preferredHeight = 120f;
-            Image avatarImage = avatarFrame.GetComponent<Image>();
-            avatarImage.color = _theme.accentSoft;
-            _ui.CreateAvatarRing(avatarFrame.transform, 108f);
-            _avatarMonogram = _ui.CreateText("AvatarMonogram", avatarFrame.transform, 44, FontStyle.Bold, TextAnchor.MiddleCenter, _theme.accent);
-            RectTransform avatarTextRect = _avatarMonogram.rectTransform;
-            _ui.Stretch(avatarTextRect, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-            _avatarMonogram.text = "?";
-            avatarFrame.SetActive(false);
-
-            GameObject metaBlock = new GameObject("MetaBlock", typeof(RectTransform));
-            metaBlock.transform.SetParent(profileTop.transform, false);
-            LayoutElement metaLayout = metaBlock.AddComponent<LayoutElement>();
-            metaLayout.flexibleWidth = 1f;
-            RectTransform metaContent = _ui.CreateVerticalContent(metaBlock, Vector2.zero, 8f, TextAnchor.UpperLeft);
-            _avatarDescription = _ui.CreateText("AvatarDescription", metaContent, _theme.smallSize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkSecondary);
-            _avatarDescription.text = string.Empty;
-            _avatarDescription.gameObject.SetActive(false);
-            _contentHeading = _ui.CreateText("ContentHeading", metaContent, 36, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
+            _contentHeading = _ui.CreateText("ContentHeading", content, _theme.bodySize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
             _contentHeading.text = string.Empty;
-
-            _readingChip = _ui.CreateChip(content, "Dica de leitura");
-            _readingChipLabel = _readingChip.GetComponentInChildren<Text>(true);
-
             _contentBody = _ui.CreateText("ContentBody", content, _theme.bodySize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkPrimary);
             _contentBody.text = string.Empty;
+            _readingChip = _ui.CreateChip(content, "Leia antes de decidir");
+            _readingChipLabel = _readingChip.GetComponentInChildren<Text>(true);
 
             _feedbackCard = _ui.CreateCard("FeedbackCard", column, true);
             _feedbackCard.SetActive(false);
@@ -392,7 +337,7 @@ namespace Identificaveis
             statsFit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             _resultsProfileTile = _ui.CreateStatTile(stats.transform, "Fase 1", "0/0");
-            _resultsScenarioTile = _ui.CreateStatTile(stats.transform, "Fase 2", "0/0");
+            _resultsScenarioTile = _ui.CreateStatTile(stats.transform, "Fases 2 a 5", "0/0");
             _resultsTotalTile = _ui.CreateStatTile(stats.transform, "Total", "0/0");
 
             RectTransform resultsContent = _ui.CreateScrollCard("ResultsCard", column, 920f);
@@ -427,11 +372,14 @@ namespace Identificaveis
             _analysis = null;
             ShowMessage(
                 "Antes de começar",
-                "O jogo menciona demissão, humilhação pública, hospitalização, reprovação, solidão e ruptura afetiva.\n\n" +
-                "Você vai passar por duas fases curtas:\n" +
+                "O jogo menciona demissão, humilhação pública, hospitalização, reprovação, solidão, ruptura afetiva e constrangimento digital.\n\n" +
+                "A partida agora atravessa cinco fases curtas:\n" +
                 "• Fase 1: decidir se um perfil parece humano ou algorítmico.\n" +
-                "• Fase 2: escolher qual reação soa mais humana em uma situação emocionalmente tensa.\n\n" +
-                "A meta não é apenas acertar. É entender por que certos sinais convenceram você.",
+                "• Fase 2: escolher qual reação pública soa mais humana.\n" +
+                "• Fase 3: reconhecer comentários que ainda parecem gente de verdade.\n" +
+                "• Fase 4: ler mensagens privadas sem cair em texto bonito demais.\n" +
+                "• Fase 5: distinguir justificativas humanas de respostas fabricadas.\n\n" +
+                "A meta não é só acertar. É perceber o que continua humano quando o formato muda.",
                 "Continuar",
                 OpenTutorialAfterWarning,
                 "Pular direto para a Fase 1",
@@ -451,10 +399,9 @@ namespace Identificaveis
         private void OpenTutorial(Action primaryAction, string primaryLabel, string secondaryLabel)
         {
             string body =
-                "Leia pouco, mas leia com atenção. O jogo foi desenhado para produzir hesitação, desconforto produtivo e revisão das próprias certezas, não para parecer aleatório.\n\n" +
-                "Na Fase 1, desconfie do que parece excessivamente limpo, estável ou pronto demais. Perfis humanos tendem a conter falha específica, contradição, detalhe banal ou humor defensivo.\n\n" +
-                "Na Fase 2, a resposta humana raramente é a mais elegante. Ela costuma ser parcial, sensorial, truncada ou menos estrategicamente apresentável.\n\n" +
-                "No modo padrão você recebe feedback imediato. No modo difícil, o jogo só explica seus erros ao fim da fase.";
+                "Na Fase 1, você observa bio e publicação. A resposta certa nem sempre é a mais bagunçada; às vezes o algoritmo imita vulnerabilidade bem demais.\n\n" +
+                "Nas Fases 2 a 5, o formato muda: reação pública, comentário, mensagem privada e justificativa. A pista não é elegância. É presença humana sob pressão: detalhe específico, ritmo estranho, ambivalência, humor defensivo, excesso, corte ou limite.\n\n" +
+                "No modo padrão você recebe feedback após cada resposta. No modo difícil, o jogo segura esse retorno até o fim de cada fase.";
 
             ShowMessage(
                 "Como jogar",
@@ -468,8 +415,10 @@ namespace Identificaveis
         private void OpenCredits()
         {
             ShowMessage(
-                "Sobre o jogo",
-                "Identificáveis é um jogo curto de leitura social e percepção narrativa.\n\nCada partida propõe observar sinais de humanidade, hesitação, excesso de polimento e reações que parecem reais no contexto.\n\nA melhor experiência é descobrir esses padrões jogando, por isso o menu principal agora vai direto ao que importa.",
+                "Créditos e direção",
+                "Conceito, GDD e direção autoral: Emli O'Mago.\n\n" +
+                "Esta versão reorganiza a base em uma linguagem mais editorial e social: hierarquia estável, blocos de leitura, estado visual consistente e componentes reutilizáveis pensados para virar prefabs editáveis no projeto.\n\n" +
+                "A lógica principal continua separada do conteúdo. Perfis e cenários permanecem no JSON, enquanto a camada visual foi preparada para variações futuras de arte e layout.",
                 "Voltar ao início",
                 ShowHome,
                 null,
@@ -489,7 +438,7 @@ namespace Identificaveis
             RenderCurrentStep();
         }
 
-        private void BeginScenarios()
+        private void BeginReactions()
         {
             if (_session == null)
             {
@@ -497,7 +446,49 @@ namespace Identificaveis
                 return;
             }
 
-            _session.phase = PhaseType.Scenarios;
+            _session.phase = PhaseType.Reactions;
+            _session.phaseIndex = 0;
+            _session.waitingForAdvance = false;
+            RenderCurrentStep();
+        }
+
+        private void BeginComments()
+        {
+            if (_session == null)
+            {
+                ShowHome();
+                return;
+            }
+
+            _session.phase = PhaseType.Comments;
+            _session.phaseIndex = 0;
+            _session.waitingForAdvance = false;
+            RenderCurrentStep();
+        }
+
+        private void BeginMessages()
+        {
+            if (_session == null)
+            {
+                ShowHome();
+                return;
+            }
+
+            _session.phase = PhaseType.Messages;
+            _session.phaseIndex = 0;
+            _session.waitingForAdvance = false;
+            RenderCurrentStep();
+        }
+
+        private void BeginJustifications()
+        {
+            if (_session == null)
+            {
+                ShowHome();
+                return;
+            }
+
+            _session.phase = PhaseType.Justifications;
             _session.phaseIndex = 0;
             _session.waitingForAdvance = false;
             RenderCurrentStep();
@@ -524,16 +515,17 @@ namespace Identificaveis
                 return;
             }
 
-            if (_session.phase == PhaseType.Scenarios)
+            if (IsPromptPhase(_session.phase))
             {
-                if (_session.phaseIndex >= _session.activeScenarios.Count)
+                System.Collections.Generic.List<ScenarioContentData> prompts = GetPromptList(_session.phase);
+                if (_session.phaseIndex >= prompts.Count)
                 {
-                    OpenResults();
+                    AdvanceToNextPhase();
                     return;
                 }
 
                 ShowGameplay();
-                RenderScenario(_session.activeScenarios[_session.phaseIndex]);
+                RenderPrompt(_session.phase, prompts[_session.phaseIndex]);
                 return;
             }
 
@@ -550,12 +542,10 @@ namespace Identificaveis
             _gameSubtitle.text = "Leia a bio e a publicação antes de decidir.";
             SetProgress(PhaseType.Profiles, _session.phaseIndex + 1, _session.activeProfiles.Count);
 
-            _avatarMonogram.text = BuildMonogram(profile.username);
-            _avatarDescription.text = string.Empty;
-            _contentHeading.text = profile.bio;
+            _contentHeading.text = "Perfil";
             _readingChip.SetActive(true);
-            _readingChipLabel.text = "Observe o conjunto: tom, detalhe, falha e naturalidade.";
-            _contentBody.text = "Publicação\n\n\"" + profile.post + "\"";
+            _readingChipLabel.text = "Observe bio e publicação antes de escolher.";
+            _contentBody.text = "Bio\n" + profile.bio + "\n\nPublicação\n\u201c" + profile.post + "\u201d";
 
             ConfigureOptionButton(0, "Parece humano", true, "H");
             ConfigureOptionButton(1, "Parece algoritmo", true, "IA");
@@ -564,35 +554,49 @@ namespace Identificaveis
 
             HideFeedback();
             _nextButton.button.gameObject.SetActive(false);
-            _nextButton.label.text = "Próximo perfil";
+            _nextButton.label.text = "Próximo";
             SetOptionInteractable(true);
             _session.waitingForAdvance = false;
         }
 
-        private void RenderScenario(ScenarioContentData scenario)
+        private void RenderPrompt(PhaseType phase, ScenarioContentData prompt)
         {
-            _phaseLabel.text = "Fase 2 — Qual reação soa mais humana?";
-            _gameTitle.text = scenario.title;
-            _gameSubtitle.text = scenario.person;
-            SetProgress(PhaseType.Scenarios, _session.phaseIndex + 1, _session.activeScenarios.Count);
+            _phaseLabel.text = GetPhaseLabel(phase);
+            _gameTitle.text = prompt.title;
+            _gameSubtitle.text = prompt.person;
+            SetProgress(phase, _session.phaseIndex + 1, GetPromptList(phase).Count);
 
-            _avatarMonogram.text = BuildMonogram(scenario.person);
-            _avatarDescription.text = string.Empty;
-            _contentHeading.text = scenario.eventText;
+            _contentHeading.text = GetContentHeading(phase);
             _readingChip.SetActive(true);
-            _readingChipLabel.text = "Escolha a reação que parece mais viva e menos montada.";
-            _contentBody.text = "Considere o contexto e escolha a resposta que soa mais humana.";
+            _readingChipLabel.text = GetReadingChipText(phase);
+            _contentBody.text = prompt.eventText;
+
+            System.Array.Clear(_displayedScenarioChoices, 0, _displayedScenarioChoices.Length);
+            var options = new System.Collections.Generic.List<ScenarioChoiceData>();
+            if (prompt.choices != null)
+            {
+                for (int i = 0; i < prompt.choices.Count; i++)
+                {
+                    if (prompt.choices[i] != null)
+                    {
+                        options.Add(prompt.choices[i]);
+                    }
+                }
+            }
+
+            IdentificaveisMatchBuilder.Shuffle(options);
 
             for (int i = 0; i < _optionButtons.Length; i++)
             {
-                bool active = scenario.choices != null && i < scenario.choices.Count;
+                bool active = i < options.Count;
+                _displayedScenarioChoices[i] = active ? options[i] : null;
                 string badge = ((char)('A' + i)).ToString();
-                ConfigureOptionButton(i, active ? scenario.choices[i].text : string.Empty, active, badge);
+                ConfigureOptionButton(i, active ? options[i].text : string.Empty, active, badge);
             }
 
             HideFeedback();
             _nextButton.button.gameObject.SetActive(false);
-            _nextButton.label.text = _session.phaseIndex >= _session.activeScenarios.Count - 1 ? "Ver resultados" : "Próximo cenário";
+            _nextButton.label.text = GetAdvanceLabel(phase);
             SetOptionInteractable(true);
             _session.waitingForAdvance = false;
         }
@@ -610,9 +614,9 @@ namespace Identificaveis
                 return;
             }
 
-            if (_session.phase == PhaseType.Scenarios)
+            if (IsPromptPhase(_session.phase))
             {
-                HandleScenarioAnswer(optionIndex);
+                HandlePromptAnswer(optionIndex);
             }
         }
 
@@ -651,20 +655,21 @@ namespace Identificaveis
             }
         }
 
-        private void HandleScenarioAnswer(int optionIndex)
+        private void HandlePromptAnswer(int optionIndex)
         {
-            ScenarioContentData scenario = _session.activeScenarios[_session.phaseIndex];
-            ScenarioChoiceData choice = scenario.choices[optionIndex];
-            ScenarioChoiceData humanChoice = scenario.GetHumanChoice();
+            System.Collections.Generic.List<ScenarioContentData> prompts = GetPromptList(_session.phase);
+            ScenarioContentData prompt = prompts[_session.phaseIndex];
+            ScenarioChoiceData choice = optionIndex >= 0 && optionIndex < _displayedScenarioChoices.Length ? _displayedScenarioChoices[optionIndex] : null;
+            ScenarioChoiceData humanChoice = prompt.GetHumanChoice();
             bool correct = choice != null && choice.isHuman;
-            string feedback = BuildScenarioFeedback(scenario, choice, humanChoice, correct);
+            string feedback = BuildScenarioFeedback(prompt, choice, humanChoice, correct);
 
             _session.answers.Add(new SessionAnswerRecord
             {
-                phase = PhaseType.Scenarios,
-                itemId = scenario.id,
+                phase = _session.phase,
+                itemId = prompt.id,
                 itemIndex = _session.phaseIndex,
-                promptTitle = scenario.title,
+                promptTitle = prompt.title,
                 playerChoice = choice != null ? choice.id : string.Empty,
                 correctChoice = humanChoice != null ? humanChoice.id : string.Empty,
                 wasCorrect = correct,
@@ -675,7 +680,7 @@ namespace Identificaveis
             if (_session.immediateFeedback)
             {
                 ShowFeedback(correct ? "✓ Leitura registrada" : "✕ Armadilha reconhecida", feedback, correct);
-                _nextButton.label.text = _session.phaseIndex >= _session.activeScenarios.Count - 1 ? "Ver resultados" : "Próximo cenário";
+                _nextButton.label.text = GetAdvanceLabel(_session.phase);
                 _nextButton.button.gameObject.SetActive(true);
                 _session.waitingForAdvance = true;
                 SetOptionInteractable(false);
@@ -694,14 +699,7 @@ namespace Identificaveis
                 return;
             }
 
-            if (_session.phase == PhaseType.Profiles)
-            {
-                _session.phaseIndex++;
-                RenderCurrentStep();
-                return;
-            }
-
-            if (_session.phase == PhaseType.Scenarios)
+            if (_session.phase == PhaseType.Profiles || IsPromptPhase(_session.phase))
             {
                 _session.phaseIndex++;
                 RenderCurrentStep();
@@ -720,7 +718,7 @@ namespace Identificaveis
 
             if (_session.immediateFeedback)
             {
-                builder.AppendLine("Na próxima etapa, a pergunta muda. Agora importa menos quem parece humano e mais que tipo de reação sobrevive quando a situação é emocionalmente tensa.");
+                builder.AppendLine("Agora o jogo sai da apresentação e passa por quatro formatos de resposta: reação pública, comentário, mensagem privada e justificativa. A pergunta continua a mesma, mas o jeito de errar muda bastante.");
             }
             else
             {
@@ -731,7 +729,7 @@ namespace Identificaveis
             ShowMessage(
                 "Resumo da Fase 1",
                 builder.ToString(),
-                "Seguir para a transição",
+                "Seguir para as próximas fases",
                 OpenTransition,
                 "Voltar ao início",
                 ShowHome);
@@ -742,10 +740,10 @@ namespace Identificaveis
             ShowMessage(
                 "Da aparência para a reação",
                 "Na Fase 1 você leu superfície, composição e sinais de estabilidade.\n\n" +
-                "Agora a experiência entra onde a humanidade costuma ficar menos elegante: reação, afeto, constrangimento, defesa, contradição e desordem.\n\n" +
-                "O jogo não quer a resposta mais madura. Quer a que parece menos otimizada para parecer boa.",
+                "Agora a experiência entra onde a humanidade costuma perder acabamento: reação pública, comentário atravessado, mensagem privada enviada na pressa e justificativa que tenta se explicar sem soar ensaiada.\n\n" +
+                "A resposta mais humana quase nunca é a mais bonita. Ela tende a carregar contexto, atrito e uma dose de falha.",
                 "Entrar na Fase 2",
-                BeginScenarios,
+                BeginReactions,
                 "Voltar ao início",
                 ShowHome);
         }
@@ -816,7 +814,7 @@ namespace Identificaveis
 
         private void RefreshHome()
         {
-            int maxScore = _database.profilesPerRun + _database.scenariosPerRun;
+            int maxScore = _database.profilesPerRun + _database.reactionsPerRun + _database.commentsPerRun + _database.messagesPerRun + _database.justificationsPerRun;
             _homeTitle.text = string.IsNullOrEmpty(_database.displayName) ? "Identificáveis" : _database.displayName;
             _homeSubtitle.text = string.IsNullOrEmpty(_database.subtitle)
                 ? "Descubra como confundimos sinais de humanidade com sinais de otimização."
@@ -824,7 +822,7 @@ namespace Identificaveis
             _homeRoundLabel.text = BuildMenuRoundText();
             _homeBestTile.value.text = IdentificaveisPreferencesStore.LoadBestScore() + "/" + maxScore;
             _homePlayedTile.value.text = IdentificaveisPreferencesStore.LoadPlayedCount().ToString();
-            _homeFormatTile.value.text = _database.profilesPerRun + "+" + _database.scenariosPerRun;
+            _homeFormatTile.value.text = maxScore + " leituras";
             RefreshMenuLabels();
         }
 
@@ -835,10 +833,12 @@ namespace Identificaveis
                 return;
             }
 
+            int promptTotal = _session.activeReactions.Count + _session.activeComments.Count + _session.activeMessages.Count + _session.activeJustifications.Count;
+
             _resultsHeadline.text = _analysis.headline;
             _resultsProfileTile.value.text = _session.ProfileHits + "/" + _session.activeProfiles.Count;
-            _resultsScenarioTile.value.text = _session.ScenarioHits + "/" + _session.activeScenarios.Count;
-            _resultsTotalTile.value.text = _session.TotalHits + "/" + (_session.activeProfiles.Count + _session.activeScenarios.Count);
+            _resultsScenarioTile.value.text = _session.PromptHits + "/" + promptTotal;
+            _resultsTotalTile.value.text = _session.TotalHits + "/" + _session.TotalQuestions;
 
             StringBuilder builder = new StringBuilder();
             builder.AppendLine(IdentificaveisResultAnalyzer.BuildStatsLine(_session));
@@ -919,9 +919,149 @@ namespace Identificaveis
             }
         }
 
+
+        private bool IsPromptPhase(PhaseType phase)
+        {
+            return phase == PhaseType.Reactions
+                || phase == PhaseType.Comments
+                || phase == PhaseType.Messages
+                || phase == PhaseType.Justifications;
+        }
+
+        private System.Collections.Generic.List<ScenarioContentData> GetPromptList(PhaseType phase)
+        {
+            switch (phase)
+            {
+                case PhaseType.Reactions:
+                    return _session.activeReactions;
+                case PhaseType.Comments:
+                    return _session.activeComments;
+                case PhaseType.Messages:
+                    return _session.activeMessages;
+                case PhaseType.Justifications:
+                    return _session.activeJustifications;
+                default:
+                    return _session.activeReactions;
+            }
+        }
+
+        private void AdvanceToNextPhase()
+        {
+            if (_session.phase == PhaseType.Reactions)
+            {
+                BeginComments();
+                return;
+            }
+
+            if (_session.phase == PhaseType.Comments)
+            {
+                BeginMessages();
+                return;
+            }
+
+            if (_session.phase == PhaseType.Messages)
+            {
+                BeginJustifications();
+                return;
+            }
+
+            if (_session.phase == PhaseType.Justifications)
+            {
+                OpenResults();
+            }
+        }
+
+        private string GetPhaseLabel(PhaseType phase)
+        {
+            switch (phase)
+            {
+                case PhaseType.Reactions:
+                    return "Fase 2 — Que reação soa humana?";
+                case PhaseType.Comments:
+                    return "Fase 3 — Que comentário parece gente?";
+                case PhaseType.Messages:
+                    return "Fase 4 — O que soaria humano no privado?";
+                case PhaseType.Justifications:
+                    return "Fase 5 — Que justificativa parece menos fabricada?";
+                default:
+                    return "Fase";
+            }
+        }
+
+        private string GetContentHeading(PhaseType phase)
+        {
+            switch (phase)
+            {
+                case PhaseType.Comments:
+                    return "Publicação";
+                case PhaseType.Messages:
+                    return "Contexto";
+                default:
+                    return "Situação";
+            }
+        }
+
+        private string GetReadingChipText(PhaseType phase)
+        {
+            switch (phase)
+            {
+                case PhaseType.Reactions:
+                    return "Escolha a reação que parece mais humana.";
+                case PhaseType.Comments:
+                    return "Escolha o comentário que parece menos fabricado.";
+                case PhaseType.Messages:
+                    return "Escolha a mensagem que parece escrita por alguém de verdade.";
+                case PhaseType.Justifications:
+                    return "Escolha a justificativa que parece mais humana.";
+                default:
+                    return "Leia antes de decidir.";
+            }
+        }
+
+        private string GetAdvanceLabel(PhaseType phase)
+        {
+            System.Collections.Generic.List<ScenarioContentData> prompts = GetPromptList(phase);
+            bool last = _session.phaseIndex >= prompts.Count - 1;
+            switch (phase)
+            {
+                case PhaseType.Reactions:
+                    return last ? "Entrar na Fase 3" : "Próxima situação";
+                case PhaseType.Comments:
+                    return last ? "Entrar na Fase 4" : "Próximo comentário";
+                case PhaseType.Messages:
+                    return last ? "Entrar na Fase 5" : "Próxima mensagem";
+                case PhaseType.Justifications:
+                    return last ? "Ver resultados" : "Próxima justificativa";
+                default:
+                    return "Próximo";
+            }
+        }
+
         private void SetProgress(PhaseType phase, int currentIndex, int total)
         {
-            string phaseName = phase == PhaseType.Profiles ? "Fase 1" : "Fase 2";
+            string phaseName;
+            switch (phase)
+            {
+                case PhaseType.Profiles:
+                    phaseName = "Fase 1";
+                    break;
+                case PhaseType.Reactions:
+                    phaseName = "Fase 2";
+                    break;
+                case PhaseType.Comments:
+                    phaseName = "Fase 3";
+                    break;
+                case PhaseType.Messages:
+                    phaseName = "Fase 4";
+                    break;
+                case PhaseType.Justifications:
+                    phaseName = "Fase 5";
+                    break;
+                default:
+                    phaseName = "Etapa";
+                    break;
+            }
+
             _progress.label.text = phaseName + " • " + currentIndex + " / " + total;
             float amount = total <= 0 ? 0f : Mathf.Clamp01((float)currentIndex / total);
             if (_progress.fill != null)
@@ -1006,28 +1146,45 @@ namespace Identificaveis
 
         private string BuildProfileFeedback(ProfileContentData profile, bool correct)
         {
-            bool expectedHuman = string.Equals(profile.correctType, "humano", StringComparison.OrdinalIgnoreCase);
-            if (expectedHuman)
+            string expected = string.Equals(profile.correctType, "humano", StringComparison.OrdinalIgnoreCase) ? "humano" : "algorítmico";
+            if (correct)
             {
-                return correct
-                    ? "Leitura correta. O perfil tem ruído, detalhe ou contradição suficientes para soar humano."
-                    : "A leitura correta era humana. Há marcas de improviso, detalhe ou contradição que quebram a sensação de texto pronto.";
+                return "Leitura correta. " + profile.signalKey;
             }
 
-            return correct
-                ? "Leitura correta. O perfil parece montado e liso demais para soar espontâneo."
-                : "A leitura correta era algorítmica. O conjunto soa polido demais e com pouco traço individual.";
+            return "A leitura mais adequada aqui era " + expected + ". " + profile.signalKey;
         }
 
         private string BuildScenarioFeedback(ScenarioContentData scenario, ScenarioChoiceData picked, ScenarioChoiceData humanChoice, bool correct)
         {
             if (correct)
             {
-                return "Leitura registrada. Essa reação parece mais situada no corpo, no instante e na tensão do momento.";
+                return scenario.reading;
             }
 
             string target = humanChoice != null ? humanChoice.text : "resposta humana não definida";
-            return "A reação mais humana era: \"" + target + "\". A alternativa escolhida soa mais organizada, explicativa ou pronta do que a situação pede.";
+            string selected = picked != null ? picked.text : "opção inválida";
+            string noun = "resposta";
+            if (scenario != null)
+            {
+                switch (scenario.phaseKey)
+                {
+                    case "reacao":
+                        noun = "reação";
+                        break;
+                    case "comentario":
+                        noun = "comentário";
+                        break;
+                    case "mensagem":
+                        noun = "mensagem";
+                        break;
+                    case "justificativa":
+                        noun = "justificativa";
+                        break;
+                }
+            }
+
+            return "A " + noun + " mais humana aqui era: “" + target + "”. Você escolheu: “" + selected + "”. " + scenario.reading;
         }
 
         private void AppendPhaseMistakes(StringBuilder builder, PhaseType phase)
@@ -1057,19 +1214,25 @@ namespace Identificaveis
 
         private string BuildMenuRoundText()
         {
-            return "Partida curta, pensada para 5 a 8 minutos, com " + _database.profilesPerRun + " perfis e " + _database.scenariosPerRun + " situações por rodada.";
+            int total = _database.profilesPerRun + _database.reactionsPerRun + _database.commentsPerRun + _database.messagesPerRun + _database.justificationsPerRun;
+            return "Cada rodada atravessa 5 fases e " + total + " leituras. Uma partida costuma durar de 5 a 8 minutos.";
         }
 
         private void RefreshMenuLabels()
         {
             if (_homeModeLabel != null)
             {
-                _homeModeLabel.text = "Modo: " + (_preferences.hardMode ? "Difícil — feedback ao fim da fase" : "Padrão — feedback a cada escolha");
+                _homeModeLabel.text = "Modo: " + (_preferences.hardMode ? "Difícil" : "Padrão");
+            }
+
+            if (_homeContrastLabel != null)
+            {
+                _homeContrastLabel.gameObject.SetActive(false);
             }
 
             if (_homeTextSizeLabel != null)
             {
-                _homeTextSizeLabel.text = "Texto: " + (_preferences.largeText ? "Ampliado" : "Padrão");
+                _homeTextSizeLabel.gameObject.SetActive(false);
             }
         }
 

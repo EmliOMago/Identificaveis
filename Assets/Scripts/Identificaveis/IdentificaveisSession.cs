@@ -60,7 +60,7 @@ namespace Identificaveis
             return SplitCsv(PlayerPrefs.GetString(KeyRecentProfiles, string.Empty));
         }
 
-        public static List<string> LoadRecentScenarios()
+        public static List<string> LoadRecentPrompts()
         {
             return SplitCsv(PlayerPrefs.GetString(KeyRecentScenarios, string.Empty));
         }
@@ -70,7 +70,7 @@ namespace Identificaveis
             SaveRecent(KeyRecentProfiles, CollectIds(entries), window);
         }
 
-        public static void SaveRecentScenarios(List<ScenarioContentData> entries, int window)
+        public static void SaveRecentPrompts(List<ScenarioContentData> entries, int window)
         {
             SaveRecent(KeyRecentScenarios, CollectIds(entries), window);
         }
@@ -172,16 +172,22 @@ namespace Identificaveis
             session.phaseIndex = 0;
 
             List<string> recentProfiles = IdentificaveisPreferencesStore.LoadRecentProfiles();
-            List<string> recentScenarios = IdentificaveisPreferencesStore.LoadRecentScenarios();
+            List<string> recentPrompts = IdentificaveisPreferencesStore.LoadRecentPrompts();
 
-            List<ProfileContentData> profiles = PickProfiles(database.profiles, database.profilesPerRun, recentProfiles);
-            List<ScenarioContentData> scenarios = PickScenarios(database.scenarios, database.scenariosPerRun, recentScenarios);
+            session.activeProfiles.AddRange(PickProfiles(database.profiles, Mathf.Max(1, database.profilesPerRun), recentProfiles));
+            session.activeReactions.AddRange(PickPrompts(database.scenarios, "reacao", Mathf.Max(1, database.reactionsPerRun > 0 ? database.reactionsPerRun : database.scenariosPerRun), recentPrompts));
+            session.activeComments.AddRange(PickPrompts(database.scenarios, "comentario", Mathf.Max(1, database.commentsPerRun), recentPrompts));
+            session.activeMessages.AddRange(PickPrompts(database.scenarios, "mensagem", Mathf.Max(1, database.messagesPerRun), recentPrompts));
+            session.activeJustifications.AddRange(PickPrompts(database.scenarios, "justificativa", Mathf.Max(1, database.justificationsPerRun), recentPrompts));
 
-            session.activeProfiles.AddRange(profiles);
-            session.activeScenarios.AddRange(scenarios);
-
-            IdentificaveisPreferencesStore.SaveRecentProfiles(session.activeProfiles, database.recentWindowProfiles);
-            IdentificaveisPreferencesStore.SaveRecentScenarios(session.activeScenarios, database.recentWindowScenarios);
+            IdentificaveisPreferencesStore.SaveRecentProfiles(session.activeProfiles, Mathf.Max(database.recentWindowProfiles, database.profilesPerRun * 2));
+            var promptBuffer = new List<ScenarioContentData>();
+            promptBuffer.AddRange(session.activeReactions);
+            promptBuffer.AddRange(session.activeComments);
+            promptBuffer.AddRange(session.activeMessages);
+            promptBuffer.AddRange(session.activeJustifications);
+            int promptWindow = database.recentWindowPrompts > 0 ? database.recentWindowPrompts : Mathf.Max(database.recentWindowScenarios, promptBuffer.Count + 4);
+            IdentificaveisPreferencesStore.SaveRecentPrompts(promptBuffer, promptWindow);
 
             return session;
         }
@@ -257,7 +263,7 @@ namespace Identificaveis
             return result;
         }
 
-        private static List<ScenarioContentData> PickScenarios(List<ScenarioContentData> source, int amount, List<string> recentIds)
+        private static List<ScenarioContentData> PickPrompts(List<ScenarioContentData> source, string phaseKey, int amount, List<string> recentIds)
         {
             var preferred = new List<ScenarioContentData>();
             var fallback = new List<ScenarioContentData>();
@@ -265,7 +271,7 @@ namespace Identificaveis
             for (int i = 0; i < source.Count; i++)
             {
                 ScenarioContentData item = source[i];
-                if (item == null)
+                if (item == null || !string.Equals(item.phaseKey, phaseKey, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
@@ -291,6 +297,12 @@ namespace Identificaveis
                 result.Add(PopFirst(fallback));
             }
 
+            while (result.Count < amount && preferred.Count > 0)
+            {
+                result.Add(PopFirst(preferred));
+            }
+
+            Shuffle(result);
             return result;
         }
 
@@ -311,7 +323,7 @@ namespace Identificaveis
             return value;
         }
 
-        private static void Shuffle<T>(List<T> list)
+        public static void Shuffle<T>(List<T> list)
         {
             System.Random random = new System.Random(Guid.NewGuid().GetHashCode());
             for (int i = list.Count - 1; i > 0; i--)
@@ -329,22 +341,22 @@ namespace Identificaveis
         public static SessionAnalysis Analyze(SessionState session)
         {
             var analysis = new SessionAnalysis();
-            int total = session.TotalHits;
+            float ratio = session.TotalQuestions <= 0 ? 0f : (float)session.TotalHits / session.TotalQuestions;
 
-            if (total <= 3)
+            if (ratio < 0.35f)
             {
-                analysis.headline = "Você leu sinais muito otimizados como se fossem humanidade.";
-                analysis.body = "Seu desempenho sugere que estética coerente, frases limpas e respostas organizadas pareceram mais confiáveis do que contradição, ruído e afeto desajeitado.";
+                analysis.headline = "Você confiou demais em texto bem embalado.";
+                analysis.body = "Seu percurso mostrou tendência a premiar frases organizadas, calmas ou exemplares demais. O jogo ficou mais longo justamente para revelar esse viés em formatos diferentes: perfil, reação, comentário, mensagem e justificativa.";
             }
-            else if (total <= 6)
+            else if (ratio < 0.68f)
             {
-                analysis.headline = "Sua leitura foi intermediária, mas ainda vulnerável a armadilhas de forma.";
-                analysis.body = "Você percebeu parte das fissuras humanas, mas ainda premiou respostas excessivamente legíveis ou perfis limpos demais em alguns momentos decisivos.";
+                analysis.headline = "Sua leitura oscilou entre detalhe humano e forma polida.";
+                analysis.body = "Em algumas fases você captou atrito, hesitação e senso de cena. Em outras, ainda caiu em respostas limpas demais, feitas para parecer sensatas, maduras ou compartilháveis.";
             }
             else
             {
-                analysis.headline = "Você teve uma leitura forte de humanidade digital.";
-                analysis.body = "Mesmo assim, o jogo foi construído para lembrar que autenticidade online continua sujeita a estética, contexto e ao desconforto que sentimos diante do que não parece bem editado.";
+                analysis.headline = "Você reconheceu bem a humanidade quando ela saiu do script.";
+                analysis.body = "Seu resultado sugere atenção a contradição, timing ruim, detalhe banal e desconforto real. Ainda assim, o jogo insiste: linguagem otimizada e humanidade convincente continuam cada vez mais próximas.";
             }
 
             Dictionary<string, int> counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -375,7 +387,7 @@ namespace Identificaveis
                     analysis.dominantPatterns.Add(sentence);
                 }
 
-                if (analysis.dominantPatterns.Count >= 3)
+                if (analysis.dominantPatterns.Count >= 4)
                 {
                     break;
                 }
@@ -392,7 +404,7 @@ namespace Identificaveis
 
                 analysis.commentedMistakes.Add(answer.promptTitle + " — " + answer.feedback);
                 commented++;
-                if (commented >= 2)
+                if (commented >= 3)
                 {
                     break;
                 }
@@ -404,13 +416,13 @@ namespace Identificaveis
         public static string BuildStatsLine(SessionState session)
         {
             return "Fase 1: " + session.ProfileHits + "/" + session.activeProfiles.Count
-                + "  •  Fase 2: " + session.ScenarioHits + "/" + session.activeScenarios.Count
-                + "  •  Total: " + session.TotalHits + "/" + (session.activeProfiles.Count + session.activeScenarios.Count);
+                + "  •  Fases 2 a 5: " + session.PromptHits + "/" + (session.activeReactions.Count + session.activeComments.Count + session.activeMessages.Count + session.activeJustifications.Count)
+                + "  •  Total: " + session.TotalHits + "/" + session.TotalQuestions;
         }
 
         public static string BuildClosingText()
         {
-            return "Confundimos o que é humano porque aprendemos a performar para sistemas que nos leem. E esses sistemas aprenderam a falar como nós. No fim, a pergunta talvez não seja quem parece humano, mas que tipo de humanidade ainda reconhecemos quando ela não está otimizada.";
+            return "Quanto mais formatos você atravessa, menos a pergunta é se algo parece humano em um único frame. O ponto passa a ser consistência imperfeita: como alguém escreve quando se apresenta, reage, comenta, consola e se justifica sem conseguir controlar tudo ao mesmo tempo.";
         }
 
         private static List<KeyValuePair<string, int>> SortByValueDescending(Dictionary<string, int> source)
@@ -449,9 +461,19 @@ namespace Identificaveis
                 case "espiritualizacao":
                     return "Você leu espiritualização imediata como se ela resolvesse o afeto.";
                 case "apelo_emocional":
-                    return "Você reagiu mais a apelos de solidariedade do que a sensação concreta da cena.";
+                    return "Você reagiu mais a apelos de solidariedade do que à sensação concreta da cena.";
                 case "humor_defensivo":
                     return "Você deixou passar humor defensivo, um sinal humano bastante recorrente.";
+                case "otimismo_forcado":
+                    return "Você premiou otimismo pronto mesmo quando a situação pedia atrito.";
+                case "afeto_genérico":
+                    return "Você aceitou afeto genérico onde cabia presença específica.";
+                case "controle_reputacional":
+                    return "Você confundiu autocontrole reputacional com sinceridade.";
+                case "tom_consultoria":
+                    return "Você caiu em respostas que soavam prontas para aconselhar, não para viver a cena.";
+                case "explicacao_lisa":
+                    return "Você preferiu justificativas limpas demais em vez de versões humanas e imperfeitas.";
                 default:
                     return string.Empty;
             }

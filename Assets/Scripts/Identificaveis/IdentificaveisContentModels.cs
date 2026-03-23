@@ -9,10 +9,15 @@ namespace Identificaveis
         public string version;
         public string displayName;
         public string subtitle;
-        public int profilesPerRun = 6;
-        public int scenariosPerRun = 3;
-        public int recentWindowProfiles = 8;
-        public int recentWindowScenarios = 4;
+        public int profilesPerRun = 8;
+        public int scenariosPerRun = 4; // legado
+        public int reactionsPerRun = 4;
+        public int commentsPerRun = 4;
+        public int messagesPerRun = 4;
+        public int justificationsPerRun = 4;
+        public int recentWindowProfiles = 18;
+        public int recentWindowScenarios = 8; // legado
+        public int recentWindowPrompts = 24;
         public List<ProfileContentData> profiles = new List<ProfileContentData>();
         public List<ScenarioContentData> scenarios = new List<ScenarioContentData>();
     }
@@ -35,6 +40,7 @@ namespace Identificaveis
     public sealed class ScenarioContentData
     {
         public string id;
+        public string phaseKey;
         public string title;
         public string person;
         public string eventText;
@@ -76,8 +82,11 @@ namespace Identificaveis
         Profiles = 2,
         ProfileSummary = 3,
         Transition = 4,
-        Scenarios = 5,
-        Results = 6
+        Reactions = 5,
+        Comments = 6,
+        Messages = 7,
+        Justifications = 8,
+        Results = 9
     }
 
     public enum PlayerChoiceKind
@@ -104,7 +113,10 @@ namespace Identificaveis
     public sealed class SessionState
     {
         public readonly List<ProfileContentData> activeProfiles = new List<ProfileContentData>();
-        public readonly List<ScenarioContentData> activeScenarios = new List<ScenarioContentData>();
+        public readonly List<ScenarioContentData> activeReactions = new List<ScenarioContentData>();
+        public readonly List<ScenarioContentData> activeComments = new List<ScenarioContentData>();
+        public readonly List<ScenarioContentData> activeMessages = new List<ScenarioContentData>();
+        public readonly List<ScenarioContentData> activeJustifications = new List<ScenarioContentData>();
         public readonly List<SessionAnswerRecord> answers = new List<SessionAnswerRecord>();
 
         public PhaseType phase = PhaseType.Tutorial;
@@ -112,41 +124,47 @@ namespace Identificaveis
         public bool waitingForAdvance;
         public bool immediateFeedback = true;
 
-        public int ProfileHits
-        {
-            get
-            {
-                int total = 0;
-                for (int i = 0; i < answers.Count; i++)
-                {
-                    if (answers[i].phase == PhaseType.Profiles && answers[i].wasCorrect)
-                    {
-                        total++;
-                    }
-                }
+        public int ProfileHits => CountHits(PhaseType.Profiles);
+        public int ReactionHits => CountHits(PhaseType.Reactions);
+        public int CommentHits => CountHits(PhaseType.Comments);
+        public int MessageHits => CountHits(PhaseType.Messages);
+        public int JustificationHits => CountHits(PhaseType.Justifications);
+        public int PromptHits => ReactionHits + CommentHits + MessageHits + JustificationHits;
+        public int TotalHits => ProfileHits + PromptHits;
+        public int TotalQuestions => activeProfiles.Count + activeReactions.Count + activeComments.Count + activeMessages.Count + activeJustifications.Count;
 
-                return total;
+        public int GetPhaseCount(PhaseType phase)
+        {
+            switch (phase)
+            {
+                case PhaseType.Profiles:
+                    return activeProfiles.Count;
+                case PhaseType.Reactions:
+                    return activeReactions.Count;
+                case PhaseType.Comments:
+                    return activeComments.Count;
+                case PhaseType.Messages:
+                    return activeMessages.Count;
+                case PhaseType.Justifications:
+                    return activeJustifications.Count;
+                default:
+                    return 0;
             }
         }
 
-        public int ScenarioHits
+        public int CountHits(PhaseType phase)
         {
-            get
+            int total = 0;
+            for (int i = 0; i < answers.Count; i++)
             {
-                int total = 0;
-                for (int i = 0; i < answers.Count; i++)
+                if (answers[i].phase == phase && answers[i].wasCorrect)
                 {
-                    if (answers[i].phase == PhaseType.Scenarios && answers[i].wasCorrect)
-                    {
-                        total++;
-                    }
+                    total++;
                 }
-
-                return total;
             }
-        }
 
-        public int TotalHits => ProfileHits + ScenarioHits;
+            return total;
+        }
     }
 
     public sealed class SessionAnalysis

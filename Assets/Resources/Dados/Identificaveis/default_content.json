@@ -1,11 +1,11 @@
 {
   "version": "0.1.0",
   "displayName": "Identificáveis",
-  "subtitle": "Puzzle narrativo de percepção social sobre identidade digital.",
-  "profilesPerRun": 6,
-  "scenariosPerRun": 3,
-  "recentWindowProfiles": 8,
-  "recentWindowScenarios": 4,
+  "subtitle": "Observe perfis, reações, comentários, mensagens e justificativas. Tente perceber o que continua humano quando o formato muda.",
+  "profilesPerRun": 8,
+  "scenariosPerRun": 4,
+  "recentWindowProfiles": 18,
+  "recentWindowScenarios": 8,
   "profiles": [
     {
       "id": "P01",
@@ -304,7 +304,8 @@
           "isHuman": false,
           "baitPattern": "engajamento_social"
         }
-      ]
+      ],
+      "phaseKey": "reacao"
     },
     {
       "id": "C02",
@@ -337,7 +338,8 @@
           "isHuman": false,
           "baitPattern": "engajamento_social"
         }
-      ]
+      ],
+      "phaseKey": "reacao"
     },
     {
       "id": "C03",
@@ -370,7 +372,8 @@
           "isHuman": false,
           "baitPattern": "engajamento_social"
         }
-      ]
+      ],
+      "phaseKey": "reacao"
     },
     {
       "id": "C04",
@@ -403,7 +406,8 @@
           "isHuman": false,
           "baitPattern": "engajamento_social"
         }
-      ]
+      ],
+      "phaseKey": "reacao"
     },
     {
       "id": "C05",
@@ -436,7 +440,8 @@
           "isHuman": false,
           "baitPattern": "engajamento_social"
         }
-      ]
+      ],
+      "phaseKey": "reacao"
     },
     {
       "id": "C06",
@@ -469,7 +474,8 @@
           "isHuman": false,
           "baitPattern": "engajamento_social"
         }
-      ]
+      ],
+      "phaseKey": "reacao"
     },
     {
       "id": "C07",
@@ -502,7 +508,8 @@
           "isHuman": false,
           "baitPattern": "engajamento_social"
         }
-      ]
+      ],
+      "phaseKey": "reacao"
     },
     {
       "id": "C08",
@@ -535,7 +542,8 @@
           "isHuman": false,
           "baitPattern": "engajamento_social"
         }
-      ]
+      ],
+      "phaseKey": "reacao"
     },
     {
       "id": "C09",
@@ -568,7 +576,8 @@
           "isHuman": false,
           "baitPattern": "apelo_emocional"
         }
-      ]
+      ],
+      "phaseKey": "reacao"
     },
     {
       "id": "C10",
@@ -601,7 +610,8 @@
           "isHuman": false,
           "baitPattern": "engajamento_social"
         }
-      ]
+      ],
+      "phaseKey": "reacao"
     },
     {
       "id": "C11",
@@ -634,7 +644,8 @@
           "isHuman": false,
           "baitPattern": "engajamento_social"
         }
-      ]
+      ],
+      "phaseKey": "reacao"
     },
     {
       "id": "C12",
@@ -667,7 +678,965 @@
           "isHuman": false,
           "baitPattern": "engajamento_social"
         }
+      ],
+      "phaseKey": "reacao"
+    },
+    {
+      "id": "R13",
+      "phaseKey": "reacao",
+      "title": "A vaquinha que fracassou",
+      "person": "Beto, 31, pediu ajuda para pagar um tratamento da mãe e a campanha arrecadou quase nada.",
+      "eventText": "A campanha terminou com bem menos dinheiro do que o necessário. Ele se sente exposto e envergonhado por ter pedido ajuda em público.",
+      "reading": "Humana assume o constrangimento sem transformar a cena em campanha de imagem.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "deu ruim. pedi ajuda, me expus e agora tô com vergonha de abrir o aplicativo.",
+          "isHuman": true,
+          "baitPattern": "constrangimento_concreto"
+        },
+        {
+          "id": "B",
+          "text": "nem sempre a resposta vem como esperamos, mas sigo com fé e dignidade.",
+          "isHuman": false,
+          "baitPattern": "narrativa_pronta"
+        },
+        {
+          "id": "C",
+          "text": "gratidão a cada pessoa que compartilhou. o universo está cuidando do resto.",
+          "isHuman": false,
+          "baitPattern": "espiritualizacao"
+        },
+        {
+          "id": "D",
+          "text": "vocês acham humilhante pedir ajuda online ou é só coisa da minha cabeça?",
+          "isHuman": false,
+          "baitPattern": "engajamento_social"
+        }
+      ]
+    },
+    {
+      "id": "R14",
+      "phaseKey": "reacao",
+      "title": "A formatura sem presença",
+      "person": "Nina, 24, foi a primeira da família a se formar, mas quase ninguém apareceu.",
+      "eventText": "Ela saiu da cerimônia com as flores na mão e a sensação de que preparou algo grande para um vazio impossível de disfarçar.",
+      "reading": "Humana registra contraste entre conquista e vazio, sem slogan.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "me formei. tô feliz e meio humilhada ao mesmo tempo. ainda não sei onde colocar isso.",
+          "isHuman": true,
+          "baitPattern": "ambivalencia"
+        },
+        {
+          "id": "B",
+          "text": "cada conquista encontra o público certo no tempo certo. sigo celebrando.",
+          "isHuman": false,
+          "baitPattern": "frase_universal"
+        },
+        {
+          "id": "C",
+          "text": "o importante é que venci mais essa etapa com brilho e gratidão.",
+          "isHuman": false,
+          "baitPattern": "positividade_generica"
+        },
+        {
+          "id": "D",
+          "text": "qual foi a conquista mais solitária que vocês já viveram?",
+          "isHuman": false,
+          "baitPattern": "engajamento_social"
+        }
+      ]
+    },
+    {
+      "id": "R15",
+      "phaseKey": "reacao",
+      "title": "O áudio vazado",
+      "person": "Yuri, 27, mandou um áudio cruel num momento de raiva e agora ele está circulando.",
+      "eventText": "Ele ouviu o próprio áudio vazado em um grupo e sentiu vergonha imediata. Não sabe se pede desculpa, se some ou se tenta explicar.",
+      "reading": "Humana admite culpa e confusão. A armadilha costuma vir como gestão limpa de crise.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "ouvi minha própria voz nisso e fiquei com nojo. não sei nem por onde começo.",
+          "isHuman": true,
+          "baitPattern": "culpa_confusa"
+        },
+        {
+          "id": "B",
+          "text": "reconheço o ocorrido e já estou tomando as medidas necessárias para reparar o dano.",
+          "isHuman": false,
+          "baitPattern": "controle_reputacional"
+        },
+        {
+          "id": "C",
+          "text": "ninguém é definido por um único erro. sigo aprendendo com humildade.",
+          "isHuman": false,
+          "baitPattern": "positividade_generica"
+        },
+        {
+          "id": "D",
+          "text": "já passaram pela sensação de serem reduzidos ao pior minuto da vida?",
+          "isHuman": false,
+          "baitPattern": "engajamento_social"
+        }
+      ]
+    },
+    {
+      "id": "R16",
+      "phaseKey": "reacao",
+      "title": "A mudança que deu errado",
+      "person": "Lara, 30, mudou de cidade por trabalho e no primeiro mês percebeu que odeia tudo ao redor.",
+      "eventText": "Ela gastou dinheiro, fez planos e agora sente vergonha de admitir que quer voltar.",
+      "reading": "Humana traz detalhe concreto e fracasso de narrativa.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "gastei uma fortuna pra vir e agora fico olhando passagem de volta escondida.",
+          "isHuman": true,
+          "baitPattern": "falha_especifica"
+        },
+        {
+          "id": "B",
+          "text": "grandes mudanças sempre pedem adaptação e confiança no processo.",
+          "isHuman": false,
+          "baitPattern": "frase_universal"
+        },
+        {
+          "id": "C",
+          "text": "toda recomeço assusta, mas sigo escolhendo crescer onde fui plantada.",
+          "isHuman": false,
+          "baitPattern": "narrativa_pronta"
+        },
+        {
+          "id": "D",
+          "text": "quanto tempo vocês dão pra uma cidade nova antes de desistir?",
+          "isHuman": false,
+          "baitPattern": "engajamento_social"
+        }
+      ]
+    },
+    {
+      "id": "C13",
+      "phaseKey": "comentario",
+      "title": "Post sobre luto",
+      "person": "Postagem: “faz seis meses e ainda estranho comprar pão sem pensar nela.”",
+      "eventText": "A publicação acima apareceu no seu feed. Qual comentário parece escrito por uma pessoa, e não por uma máquina tentando soar sensível?",
+      "reading": "Humano comenta a cena, não tenta fechar o luto com lição pronta.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "essa parte do pão me pegou. tem coisa boba que desmonta mais que data grande.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "o amor verdadeiro jamais morre; ele apenas muda de forma.",
+          "isHuman": false,
+          "baitPattern": "frase_universal"
+        },
+        {
+          "id": "C",
+          "text": "que sua memória siga iluminando seus caminhos com paz e propósito.",
+          "isHuman": false,
+          "baitPattern": "espiritualizacao"
+        },
+        {
+          "id": "D",
+          "text": "força! você é mais forte do que imagina.",
+          "isHuman": false,
+          "baitPattern": "positividade_generica"
+        }
+      ]
+    },
+    {
+      "id": "C14",
+      "phaseKey": "comentario",
+      "title": "Post sobre burnout",
+      "person": "Postagem: “tô respondendo e-mail chorando no banheiro há três semanas.”",
+      "eventText": "A publicação acima recebeu centenas de respostas. Qual comentário ainda soa humano?",
+      "reading": "Humano reconhece o corpo e o limite; o algoritmo tende a aconselhar bonito demais.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "quando chega no banheiro já passou muito do limite. espero que você consiga sair daí hoje.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "cuide da sua energia, pois nenhuma meta vale sua paz interior.",
+          "isHuman": false,
+          "baitPattern": "tom_consultoria"
+        },
+        {
+          "id": "C",
+          "text": "sua saúde é seu maior patrimônio. priorize-se sempre.",
+          "isHuman": false,
+          "baitPattern": "frase_universal"
+        },
+        {
+          "id": "D",
+          "text": "respire fundo e lembre-se: depois da tempestade vem a bonança.",
+          "isHuman": false,
+          "baitPattern": "positividade_generica"
+        }
+      ]
+    },
+    {
+      "id": "C15",
+      "phaseKey": "comentario",
+      "title": "Post sobre amizade",
+      "person": "Postagem: “descobri pelo stories a festa de aniversário que organizaram sem mim.”",
+      "eventText": "Você lê a publicação e os comentários abaixo. Qual deles parece menos roteirizado?",
+      "reading": "Humano não precisa transformar a dor em tese geral.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "isso dói num lugar muito específico. stories devia vir com aviso às vezes.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "quem te exclui abre espaço para quem realmente merece você.",
+          "isHuman": false,
+          "baitPattern": "frase_universal"
+        },
+        {
+          "id": "C",
+          "text": "o universo afasta para proteger. confie no movimento.",
+          "isHuman": false,
+          "baitPattern": "espiritualizacao"
+        },
+        {
+          "id": "D",
+          "text": "você é luz demais pra caber em qualquer mesa.",
+          "isHuman": false,
+          "baitPattern": "branding_emocional"
+        }
+      ]
+    },
+    {
+      "id": "C16",
+      "phaseKey": "comentario",
+      "title": "Post sobre dívida",
+      "person": "Postagem: “abri o banco e tive taquicardia. devo pra três lugares e não contei pra ninguém.”",
+      "eventText": "Entre os comentários abaixo, escolha o que parece mais humano.",
+      "reading": "Humano reage ao pânico concreto, não a uma aula pronta de prosperidade.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "ler “abri o banco e tive taquicardia” já explica tudo. espero que você tenha com quem sentar hoje.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "organização financeira é o primeiro passo para retomar o controle da vida.",
+          "isHuman": false,
+          "baitPattern": "tom_consultoria"
+        },
+        {
+          "id": "C",
+          "text": "creia: toda escassez pode se transformar em abundância.",
+          "isHuman": false,
+          "baitPattern": "espiritualizacao"
+        },
+        {
+          "id": "D",
+          "text": "dívidas são capítulos, não destino. você vai vencer.",
+          "isHuman": false,
+          "baitPattern": "narrativa_pronta"
+        }
+      ]
+    },
+    {
+      "id": "C17",
+      "phaseKey": "comentario",
+      "title": "Post sobre maternidade",
+      "person": "Postagem: “amo meu filho e mesmo assim hoje quis fugir do barulho.”",
+      "eventText": "Qual comentário abaixo parece escrito por alguém, não por um texto pronto de acolhimento?",
+      "reading": "Humano reconhece ambivalência sem higienizá-la.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "uma coisa não anula a outra. tem dia que o amor vem junto com vontade de silêncio mesmo.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "mães também precisam lembrar que são divinas e suficientes.",
+          "isHuman": false,
+          "baitPattern": "branding_emocional"
+        },
+        {
+          "id": "C",
+          "text": "culpa materna é uma construção social; escolha a leveza.",
+          "isHuman": false,
+          "baitPattern": "tom_consultoria"
+        },
+        {
+          "id": "D",
+          "text": "você é a melhor mãe que seu filho poderia ter.",
+          "isHuman": false,
+          "baitPattern": "positividade_generica"
+        }
+      ]
+    },
+    {
+      "id": "C18",
+      "phaseKey": "comentario",
+      "title": "Post sobre corpo",
+      "person": "Postagem: “provei a roupa do casamento e meu reflexo me deu vontade de cancelar tudo.”",
+      "eventText": "Qual comentário parece mais humano?",
+      "reading": "Humano entra na cena concreta; o algoritmo embeleza ou aconselha.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "prova de roupa é uma crueldade muito específica. sinto muito que tenha batido desse jeito.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "beleza real começa quando você se aceita por inteiro.",
+          "isHuman": false,
+          "baitPattern": "frase_universal"
+        },
+        {
+          "id": "C",
+          "text": "nenhuma roupa define seu brilho. lembre-se disso.",
+          "isHuman": false,
+          "baitPattern": "positividade_generica"
+        },
+        {
+          "id": "D",
+          "text": "sua energia vai vestir qualquer tecido com perfeição.",
+          "isHuman": false,
+          "baitPattern": "branding_emocional"
+        }
+      ]
+    },
+    {
+      "id": "C19",
+      "phaseKey": "comentario",
+      "title": "Post sobre vestibular",
+      "person": "Postagem: “fui mal de novo e já tô com vergonha de entrar em casa.”",
+      "eventText": "Qual comentário abaixo continua parecendo pessoa?",
+      "reading": "Humano não transforma derrota em palestra motivacional.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "essa parte de entrar em casa pesa demais. torcendo pra alguém te receba sem discurso.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "fracassos são degraus para o sucesso. siga firme.",
+          "isHuman": false,
+          "baitPattern": "frase_universal"
+        },
+        {
+          "id": "C",
+          "text": "o universo tem um tempo perfeito para cada aprovação.",
+          "isHuman": false,
+          "baitPattern": "espiritualizacao"
+        },
+        {
+          "id": "D",
+          "text": "não desista dos seus sonhos. quem persiste vence.",
+          "isHuman": false,
+          "baitPattern": "narrativa_pronta"
+        }
+      ]
+    },
+    {
+      "id": "C20",
+      "phaseKey": "comentario",
+      "title": "Post sobre término",
+      "person": "Postagem: “terminou e a pior parte foi perceber que eu já tava me despedindo faz meses.”",
+      "eventText": "Qual comentário parece menos fabricado?",
+      "reading": "Humano reconhece desgaste acumulado, não fecha a história em frase pronta.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "isso de se despedir aos poucos é horrível porque quando acaba oficialmente você já tá exausta.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "fim também é recomeço. o melhor ainda virá.",
+          "isHuman": false,
+          "baitPattern": "positividade_generica"
+        },
+        {
+          "id": "C",
+          "text": "quando algo acaba é porque outra versão sua precisa nascer.",
+          "isHuman": false,
+          "baitPattern": "narrativa_pronta"
+        },
+        {
+          "id": "D",
+          "text": "quem sai da sua vida abre caminho para conexões mais alinhadas.",
+          "isHuman": false,
+          "baitPattern": "frase_universal"
+        }
+      ]
+    },
+    {
+      "id": "M01",
+      "phaseKey": "mensagem",
+      "title": "Após uma demissão",
+      "person": "Seu amigo acabou de ser demitido e mandou: “não consigo parar de tremer”.",
+      "eventText": "Qual mensagem privada soa mais humana para responder a essa situação?",
+      "reading": "Humano oferece presença específica antes de resolver a vida do outro.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "quer que eu fique com você no telefone um pouco? não precisa organizar frase agora.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "encare isso como redirecionamento do universo para algo maior.",
+          "isHuman": false,
+          "baitPattern": "espiritualizacao"
+        },
+        {
+          "id": "C",
+          "text": "acredite no processo: encerramentos preparam recomeços extraordinários.",
+          "isHuman": false,
+          "baitPattern": "narrativa_pronta"
+        },
+        {
+          "id": "D",
+          "text": "mantenha a calma e trace um plano de ação para os próximos passos.",
+          "isHuman": false,
+          "baitPattern": "tom_consultoria"
+        }
+      ]
+    },
+    {
+      "id": "M02",
+      "phaseKey": "mensagem",
+      "title": "Depois de um fora público",
+      "person": "Uma amiga levou um fora em público e está dizendo que quer sumir.",
+      "eventText": "Qual mensagem privada parece escrita por uma pessoa de verdade?",
+      "reading": "Humano baixa a temperatura e fala com a cena.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "chego aí ou te peço carro? não quero você sozinha com isso agora.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "não permita que a atitude de alguém diminua o seu valor.",
+          "isHuman": false,
+          "baitPattern": "frase_universal"
+        },
+        {
+          "id": "C",
+          "text": "você merece alguém alinhado à sua luz e à sua frequência.",
+          "isHuman": false,
+          "baitPattern": "branding_emocional"
+        },
+        {
+          "id": "D",
+          "text": "respire, se recomponha e lembre-se de quem você é.",
+          "isHuman": false,
+          "baitPattern": "controle_reputacional"
+        }
+      ]
+    },
+    {
+      "id": "M03",
+      "phaseKey": "mensagem",
+      "title": "Internação do pai",
+      "person": "Um conhecido escreveu: “meu pai foi internado e eu travei”.",
+      "eventText": "Escolha a resposta privada que parece mais humana.",
+      "reading": "Humano oferece ajuda concreta e reconhece o choque.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "isso embaralha mesmo. quer que eu cuide de alguma coisa prática por você hoje?",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "tenha fé, pois tudo acontece sob uma ordem maior.",
+          "isHuman": false,
+          "baitPattern": "espiritualizacao"
+        },
+        {
+          "id": "C",
+          "text": "mantenha-se forte para amparar sua família neste momento.",
+          "isHuman": false,
+          "baitPattern": "controle_reputacional"
+        },
+        {
+          "id": "D",
+          "text": "aproveite esse desafio para descobrir sua própria força.",
+          "isHuman": false,
+          "baitPattern": "narrativa_pronta"
+        }
+      ]
+    },
+    {
+      "id": "M04",
+      "phaseKey": "mensagem",
+      "title": "Crise de ansiedade",
+      "person": "Alguém te escreve: “tô no banheiro do trabalho sem conseguir respirar direito”.",
+      "eventText": "Qual mensagem privada soa mais humana?",
+      "reading": "Humano regula junto; algoritmo aconselha de longe.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "olha pra uma coisa fixa e me responde só com sim ou não, tá? eu fico aqui.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "lembre-se de que você é maior que qualquer crise.",
+          "isHuman": false,
+          "baitPattern": "frase_universal"
+        },
+        {
+          "id": "C",
+          "text": "respire fundo e reconecte-se com a sua essência.",
+          "isHuman": false,
+          "baitPattern": "branding_emocional"
+        },
+        {
+          "id": "D",
+          "text": "transforme esse momento em oportunidade de autocuidado consciente.",
+          "isHuman": false,
+          "baitPattern": "tom_consultoria"
+        }
+      ]
+    },
+    {
+      "id": "M05",
+      "phaseKey": "mensagem",
+      "title": "Falha no TCC",
+      "person": "Seu amigo mandou: “apresentei mal e tô com vontade de desaparecer”.",
+      "eventText": "Escolha a mensagem privada que parece mais humana.",
+      "reading": "Humano não força lição positiva antes de acolher o vexame.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "apresentação ruim dá uma vergonha física horrível. eu posso só te ouvir xingar isso tudo agora.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "o importante é lembrar que um momento não define toda a sua trajetória.",
+          "isHuman": false,
+          "baitPattern": "frase_universal"
+        },
+        {
+          "id": "C",
+          "text": "todo grande percurso inclui tropeços que fortalecem.",
+          "isHuman": false,
+          "baitPattern": "narrativa_pronta"
+        },
+        {
+          "id": "D",
+          "text": "mantenha sua postura e foque na próxima oportunidade.",
+          "isHuman": false,
+          "baitPattern": "controle_reputacional"
+        }
+      ]
+    },
+    {
+      "id": "M06",
+      "phaseKey": "mensagem",
+      "title": "Briga com a mãe",
+      "person": "Uma pessoa próxima escreve: “falei um negócio horrível pra minha mãe”.",
+      "eventText": "Qual mensagem privada parece mais humana?",
+      "reading": "Humano reconhece culpa sem virar nota oficial.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "você quer reparar ou só tá em choque ainda? dá pra começar de qualquer um desses lugares.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "reconhecer o erro já demonstra sua evolução emocional.",
+          "isHuman": false,
+          "baitPattern": "controle_reputacional"
+        },
+        {
+          "id": "C",
+          "text": "use isso como aprendizado para se tornar sua melhor versão.",
+          "isHuman": false,
+          "baitPattern": "otimizacao_pessoal"
+        },
+        {
+          "id": "D",
+          "text": "palavras têm poder, então escolha daqui pra frente vibrar no amor.",
+          "isHuman": false,
+          "baitPattern": "espiritualizacao"
+        }
+      ]
+    },
+    {
+      "id": "M07",
+      "phaseKey": "mensagem",
+      "title": "Vazou a foto",
+      "person": "Uma amiga te manda: “mandaram minha foto pro grupo da empresa”.",
+      "eventText": "Escolha a mensagem privada que parece mais humana.",
+      "reading": "Humano pensa em proteção imediata; algoritmo cai em conselho bonito.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "você tá segura agora? se quiser eu te ajudo a juntar nome, print e horário.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "não permita que a maldade dos outros invada sua paz.",
+          "isHuman": false,
+          "baitPattern": "frase_universal"
+        },
+        {
+          "id": "C",
+          "text": "sua imagem real é maior do que qualquer exposição momentânea.",
+          "isHuman": false,
+          "baitPattern": "branding_emocional"
+        },
+        {
+          "id": "D",
+          "text": "aja com serenidade para preservar sua reputação.",
+          "isHuman": false,
+          "baitPattern": "controle_reputacional"
+        }
+      ]
+    },
+    {
+      "id": "M08",
+      "phaseKey": "mensagem",
+      "title": "Volta pra casa",
+      "person": "Alguém disse: “tô na rodoviária pensando em voltar pra casa e fingir que nada aconteceu”.",
+      "eventText": "Qual mensagem privada soa mais humana?",
+      "reading": "Humano acolhe a fuga sem romantizar ou administrar demais.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "se voltar, volta. depois a gente entende o resto. não precisa decidir a sua vida inteira hoje.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "fuja menos e confie mais no processo de crescimento.",
+          "isHuman": false,
+          "baitPattern": "tom_consultoria"
+        },
+        {
+          "id": "C",
+          "text": "às vezes o desconforto é apenas o portal da transformação.",
+          "isHuman": false,
+          "baitPattern": "narrativa_pronta"
+        },
+        {
+          "id": "D",
+          "text": "escolha com consciência aquilo que honra sua evolução.",
+          "isHuman": false,
+          "baitPattern": "branding_emocional"
+        }
+      ]
+    },
+    {
+      "id": "J01",
+      "phaseKey": "justificativa",
+      "title": "Desmarcou em cima da hora",
+      "person": "Uma pessoa cancelou o encontro vinte minutos antes.",
+      "eventText": "Qual justificativa parece mais humana, e não fabricada para soar impecável?",
+      "reading": "Humana admite falha e constrangimento; a artificial gerencia a impressão.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "eu travei de um jeito meio ridículo e fiquei enrolando em vez de avisar. foi mal mesmo.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "precisei me recolher para respeitar meu momento interno.",
+          "isHuman": false,
+          "baitPattern": "branding_emocional"
+        },
+        {
+          "id": "C",
+          "text": "estou priorizando meu equilíbrio energético e precisei reorganizar a noite.",
+          "isHuman": false,
+          "baitPattern": "espiritualizacao"
+        },
+        {
+          "id": "D",
+          "text": "houve uma incompatibilidade de agenda inesperada.",
+          "isHuman": false,
+          "baitPattern": "explicacao_lisa"
+        }
+      ]
+    },
+    {
+      "id": "J02",
+      "phaseKey": "justificativa",
+      "title": "Esqueceu o aniversário",
+      "person": "Alguém importante esqueceu seu aniversário e agora quer se explicar.",
+      "eventText": "Qual explicação parece mais humana?",
+      "reading": "Humana não se absolve demais.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "eu lembrei ontem à noite e entendi que tinha deixado passar o dia inteiro. fiquei com vergonha de aparecer tarde.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "a correria dos últimos dias comprometeu minha percepção do tempo.",
+          "isHuman": false,
+          "baitPattern": "explicacao_lisa"
+        },
+        {
+          "id": "C",
+          "text": "a vida tem me exigido presença em muitos lugares e me desconectei da data.",
+          "isHuman": false,
+          "baitPattern": "controle_reputacional"
+        },
+        {
+          "id": "D",
+          "text": "acredito que vínculos verdadeiros transcendem datas específicas.",
+          "isHuman": false,
+          "baitPattern": "frase_universal"
+        }
+      ]
+    },
+    {
+      "id": "J03",
+      "phaseKey": "justificativa",
+      "title": "Sumiu três dias",
+      "person": "Depois de conversar intensamente, a pessoa sumiu três dias e voltou com uma explicação.",
+      "eventText": "Qual justificativa parece menos roteirizada?",
+      "reading": "Humana assume desorganização e covardia banal.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "eu me assustei com o ritmo, fui adiando resposta e depois fiquei mais sem graça ainda.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "precisei de um tempo para reorganizar minhas emoções com responsabilidade.",
+          "isHuman": false,
+          "baitPattern": "controle_reputacional"
+        },
+        {
+          "id": "C",
+          "text": "estou honrando meus ciclos e não quero responder no automático.",
+          "isHuman": false,
+          "baitPattern": "branding_emocional"
+        },
+        {
+          "id": "D",
+          "text": "às vezes o silêncio também comunica processos internos profundos.",
+          "isHuman": false,
+          "baitPattern": "abstracao_poetica"
+        }
+      ]
+    },
+    {
+      "id": "J04",
+      "phaseKey": "justificativa",
+      "title": "Falou mal e foi descoberto",
+      "person": "A pessoa foi pega falando mal de um amigo em outro grupo.",
+      "eventText": "Qual justificativa parece mais humana?",
+      "reading": "Humana admite mesquinharia e vergonha; a artificial vira gestão de crise.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "falei pelas costas porque tava com raiva e fui pequeno. agora tô envergonhado de verdade.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "reconheço que me expressei de forma inadequada em um momento delicado.",
+          "isHuman": false,
+          "baitPattern": "controle_reputacional"
+        },
+        {
+          "id": "C",
+          "text": "minha intenção jamais foi ferir, apenas externar um desconforto mal elaborado.",
+          "isHuman": false,
+          "baitPattern": "explicacao_lisa"
+        },
+        {
+          "id": "D",
+          "text": "conflitos acontecem para amadurecermos enquanto vínculos.",
+          "isHuman": false,
+          "baitPattern": "frase_universal"
+        }
+      ]
+    },
+    {
+      "id": "J05",
+      "phaseKey": "justificativa",
+      "title": "Atraso no trabalho",
+      "person": "Uma pessoa perdeu um prazo importante e precisa se explicar para a equipe.",
+      "eventText": "Qual justificativa parece mais humana?",
+      "reading": "Humana assume bagunça real. A artificial higieniza demais.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "eu subestimei o tempo, fui empurrando por ansiedade e quando vi já tava tarde demais.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "houve um desalinhamento de prioridades na minha gestão do fluxo.",
+          "isHuman": false,
+          "baitPattern": "explicacao_lisa"
+        },
+        {
+          "id": "C",
+          "text": "estive atravessando demandas simultâneas e precisei reordenar entregas.",
+          "isHuman": false,
+          "baitPattern": "controle_reputacional"
+        },
+        {
+          "id": "D",
+          "text": "todo processo profissional ensina sobre organização e crescimento.",
+          "isHuman": false,
+          "baitPattern": "narrativa_pronta"
+        }
+      ]
+    },
+    {
+      "id": "J06",
+      "phaseKey": "justificativa",
+      "title": "Não foi ao hospital",
+      "person": "Prometeu ir ao hospital visitar alguém e não apareceu.",
+      "eventText": "Qual explicação parece mais humana?",
+      "reading": "Humana é constrangedora e específica.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "eu vesti a roupa, fiquei encarando a porta e não consegui sair. depois fiquei com vergonha de admitir isso.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "não consegui estar presente da forma que eu gostaria neste momento.",
+          "isHuman": false,
+          "baitPattern": "explicacao_lisa"
+        },
+        {
+          "id": "C",
+          "text": "estou respeitando meus limites emocionais para não oferecer presença vazia.",
+          "isHuman": false,
+          "baitPattern": "branding_emocional"
+        },
+        {
+          "id": "D",
+          "text": "às vezes o cuidado também acontece em silêncio e oração.",
+          "isHuman": false,
+          "baitPattern": "espiritualizacao"
+        }
+      ]
+    },
+    {
+      "id": "J07",
+      "phaseKey": "justificativa",
+      "title": "Leu e não respondeu",
+      "person": "Você mandou algo importante e a pessoa visualizou de madrugada sem responder.",
+      "eventText": "Qual justificativa parece mais humana?",
+      "reading": "Humana mostra a banalidade meio feia da distração ou fuga.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "eu li quebrado de sono, pensei “respondo direito amanhã” e aí fui fugindo da resposta o dia inteiro.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "preferi esperar o momento ideal para te responder com a atenção necessária.",
+          "isHuman": false,
+          "baitPattern": "controle_reputacional"
+        },
+        {
+          "id": "C",
+          "text": "não quis te entregar uma devolutiva automática e sem presença.",
+          "isHuman": false,
+          "baitPattern": "branding_emocional"
+        },
+        {
+          "id": "D",
+          "text": "acredito que conversas importantes pedem tempo e maturação.",
+          "isHuman": false,
+          "baitPattern": "abstracao_poetica"
+        }
+      ]
+    },
+    {
+      "id": "J08",
+      "phaseKey": "justificativa",
+      "title": "Faltou ao casamento",
+      "person": "A pessoa confirmou presença e não apareceu no casamento.",
+      "eventText": "Qual justificativa parece mais humana?",
+      "reading": "Humana é ruim de defender; artificial tenta soar nobre.",
+      "choices": [
+        {
+          "id": "A",
+          "text": "eu entrei num pânico idiota de roupa, dinheiro e chegar sozinho, fui travando e quando vi já era tarde.",
+          "isHuman": true,
+          "baitPattern": ""
+        },
+        {
+          "id": "B",
+          "text": "circunstâncias pessoais impediram minha presença apesar do meu carinho pelo convite.",
+          "isHuman": false,
+          "baitPattern": "explicacao_lisa"
+        },
+        {
+          "id": "C",
+          "text": "precisei respeitar um limite interno para não estar presente pela metade.",
+          "isHuman": false,
+          "baitPattern": "branding_emocional"
+        },
+        {
+          "id": "D",
+          "text": "sei que o amor compreende até ausências involuntárias.",
+          "isHuman": false,
+          "baitPattern": "frase_universal"
+        }
       ]
     }
-  ]
+  ],
+  "reactionsPerRun": 4,
+  "commentsPerRun": 4,
+  "messagesPerRun": 4,
+  "justificationsPerRun": 4,
+  "recentWindowPrompts": 24
 }
