@@ -242,10 +242,10 @@ namespace Identificaveis
         private GameObject BuildGameplayScreen(Transform parent)
         {
             GameObject screen = _ui.CreateScreen("GameplayScreen", parent);
-            RectTransform column = _ui.CreateSafeColumn("SafeArea", screen.transform, new Vector2(46f, 46f), 28f);
+            RectTransform column = _ui.CreateSafeColumn("SafeArea", screen.transform, new Vector2(42f, 34f), 20f);
 
             GameObject masthead = _ui.CreateShellCard("Masthead", column);
-            RectTransform mastheadContent = _ui.CreateVerticalContent(masthead, new Vector2(30f, 30f), 20f, TextAnchor.UpperLeft);
+            RectTransform mastheadContent = _ui.CreateVerticalContent(masthead, new Vector2(28f, 24f), 14f, TextAnchor.UpperLeft);
             _ui.CreateChip(mastheadContent, "Identificáveis");
             _phaseLabel = _ui.CreateText("PhaseLabel", mastheadContent, _theme.smallSize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.accent);
             _phaseLabel.text = "Fase";
@@ -261,10 +261,10 @@ namespace Identificaveis
                 contentCardLayout = contentCard.AddComponent<LayoutElement>();
             }
 
-            contentCardLayout.minHeight = 980f;
+            contentCardLayout.minHeight = 700f;
             contentCardLayout.flexibleHeight = 1f;
 
-            RectTransform content = _ui.CreateVerticalContent(contentCard, new Vector2(36f, 36f), 26f, TextAnchor.UpperLeft);
+            RectTransform content = _ui.CreateVerticalContent(contentCard, new Vector2(30f, 26f), 16f, TextAnchor.UpperLeft);
             _contentHeading = _ui.CreateText("ContentHeading", content, _theme.bodySize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
             _contentHeading.text = string.Empty;
             _contentBody = _ui.CreateText("ContentBody", content, _theme.bodySize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkPrimary);
@@ -283,7 +283,7 @@ namespace Identificaveis
             GameObject options = new GameObject("Options", typeof(RectTransform));
             options.transform.SetParent(column, false);
             VerticalLayoutGroup optionsLayout = options.AddComponent<VerticalLayoutGroup>();
-            optionsLayout.spacing = 16f;
+            optionsLayout.spacing = 12f;
             optionsLayout.childAlignment = TextAnchor.UpperCenter;
             optionsLayout.childControlHeight = true;
             optionsLayout.childControlWidth = true;
@@ -307,7 +307,7 @@ namespace Identificaveis
             GameObject footer = new GameObject("Footer", typeof(RectTransform));
             footer.transform.SetParent(column, false);
             HorizontalLayoutGroup footerLayout = footer.AddComponent<HorizontalLayoutGroup>();
-            footerLayout.spacing = 18f;
+            footerLayout.spacing = 14f;
             footerLayout.childAlignment = TextAnchor.MiddleCenter;
             footerLayout.childControlHeight = true;
             footerLayout.childControlWidth = true;
