@@ -54,7 +54,7 @@ namespace Identificaveis
             _theme = theme;
             _font = font;
             _textScale = textScale;
-            _uiSprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
+            _uiSprite = CreateRuntimeUiSprite();
             _logoSprite = CreateLogoSprite();
             _gridSprite = CreateGridSprite();
             _avatarRingSprite = CreateAvatarRingSprite();
@@ -247,15 +247,17 @@ namespace Identificaveis
 
         public Text CreateText(string name, Transform parent, int size, FontStyle style, TextAnchor anchor, Color color)
         {
-            GameObject go = new GameObject(name, typeof(RectTransform), typeof(Text));
+            GameObject go = new GameObject(name, typeof(RectTransform), typeof(Text), typeof(LayoutElement));
             go.transform.SetParent(parent, false);
 
             RectTransform rect = go.GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0f, 0.5f);
-            rect.anchorMax = new Vector2(1f, 0.5f);
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
+            rect.anchorMin = new Vector2(0f, 1f);
+            rect.anchorMax = new Vector2(1f, 1f);
+            rect.pivot = new Vector2(0.5f, 1f);
+            rect.sizeDelta = Vector2.zero;
+
+            LayoutElement layout = go.GetComponent<LayoutElement>();
+            layout.flexibleWidth = 1f;
 
             Text text = go.GetComponent<Text>();
             text.font = _font;
@@ -266,11 +268,6 @@ namespace Identificaveis
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Overflow;
             text.supportRichText = true;
-            text.resizeTextForBestFit = false;
-            text.alignByGeometry = false;
-
-            LayoutElement element = go.AddComponent<LayoutElement>();
-            element.flexibleWidth = 1f;
 
             ContentSizeFitter fitter = go.AddComponent<ContentSizeFitter>();
             fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
@@ -727,8 +724,23 @@ namespace Identificaveis
             if (image != null && image.sprite == null)
             {
                 image.sprite = _uiSprite;
-                image.type = Image.Type.Sliced;
+                image.type = image.sprite != null && image.sprite.border.sqrMagnitude > 0f ? Image.Type.Sliced : Image.Type.Simple;
             }
+        }
+
+        private Sprite CreateRuntimeUiSprite()
+        {
+            const int size = 8;
+            Texture2D texture = NewTexture(size, size);
+            Color[] pixels = new Color[size * size];
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                pixels[i] = Color.white;
+            }
+
+            texture.SetPixels(pixels);
+            texture.Apply(false, true);
+            return MakeSprite(texture, new Vector4(3f, 3f, 3f, 3f));
         }
 
         private Sprite CreateLogoSprite()
@@ -831,7 +843,12 @@ namespace Identificaveis
 
         private static Sprite MakeSprite(Texture2D texture)
         {
-            Sprite sprite = Sprite.Create(texture, new Rect(0f, 0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100f);
+            return MakeSprite(texture, Vector4.zero);
+        }
+
+        private static Sprite MakeSprite(Texture2D texture, Vector4 border)
+        {
+            Sprite sprite = Sprite.Create(texture, new Rect(0f, 0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect, border);
             sprite.name = texture.name + "_Sprite";
             sprite.hideFlags = HideFlags.HideAndDontSave;
             return sprite;

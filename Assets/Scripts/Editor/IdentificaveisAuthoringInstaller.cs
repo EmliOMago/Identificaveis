@@ -21,6 +21,7 @@ namespace Identificaveis.Editor
         private const string SpritesRoot = "Assets/Art/Identificaveis/Sprites";
         private const string ThemeRoot = "Assets/Configs/Identificaveis";
         private const string ThemeAssetPath = ThemeRoot + "/IdentificaveisTheme.asset";
+        private const string UiBaseSpritePath = SpritesRoot + "/ui_base.png";
 
         static IdentificaveisAuthoringInstaller()
         {
@@ -71,6 +72,7 @@ namespace Identificaveis.Editor
             ConfigureSpriteImporter(SpritesRoot + "/logo_mark.png");
             ConfigureSpriteImporter(SpritesRoot + "/soft_grid.png");
             ConfigureSpriteImporter(SpritesRoot + "/avatar_ring.png");
+            ConfigureSpriteImporter(UiBaseSpritePath);
 
             EnsureThemeAsset(force);
             EnsurePrefab(PrefabsRoot + "/ActionButton.prefab", CreateActionButtonPrefab, force);
@@ -198,7 +200,7 @@ namespace Identificaveis.Editor
             GameObject root = new GameObject("SurfaceCard", typeof(RectTransform), typeof(Image), typeof(LayoutElement), typeof(Shadow));
             Image image = root.GetComponent<Image>();
             image.sprite = GetUiSprite();
-            image.type = Image.Type.Sliced;
+            image.type = image.sprite != null ? Image.Type.Sliced : Image.Type.Simple;
             image.color = Color.white;
             LayoutElement element = root.GetComponent<LayoutElement>();
             element.minHeight = 120f;
@@ -213,7 +215,7 @@ namespace Identificaveis.Editor
             GameObject root = new GameObject("StatTile", typeof(RectTransform), typeof(Image), typeof(LayoutElement));
             Image image = root.GetComponent<Image>();
             image.sprite = GetUiSprite();
-            image.type = Image.Type.Sliced;
+            image.type = image.sprite != null ? Image.Type.Sliced : Image.Type.Simple;
             LayoutElement element = root.GetComponent<LayoutElement>();
             element.minHeight = 136f;
             element.flexibleWidth = 1f;
@@ -242,7 +244,7 @@ namespace Identificaveis.Editor
             GameObject root = new GameObject("Chip", typeof(RectTransform), typeof(Image), typeof(LayoutElement), typeof(HorizontalLayoutGroup), typeof(ContentSizeFitter));
             Image image = root.GetComponent<Image>();
             image.sprite = GetUiSprite();
-            image.type = Image.Type.Sliced;
+            image.type = image.sprite != null ? Image.Type.Sliced : Image.Type.Simple;
             LayoutElement element = root.GetComponent<LayoutElement>();
             element.minHeight = 60f;
             HorizontalLayoutGroup layout = root.GetComponent<HorizontalLayoutGroup>();
@@ -265,7 +267,7 @@ namespace Identificaveis.Editor
             GameObject root = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button), typeof(LayoutElement));
             Image image = root.GetComponent<Image>();
             image.sprite = GetUiSprite();
-            image.type = Image.Type.Sliced;
+            image.type = image.sprite != null ? Image.Type.Sliced : Image.Type.Simple;
             LayoutElement element = root.GetComponent<LayoutElement>();
             element.minHeight = minHeight;
             element.flexibleWidth = 1f;
@@ -283,14 +285,6 @@ namespace Identificaveis.Editor
         {
             GameObject go = new GameObject(name, typeof(RectTransform), typeof(Text));
             go.transform.SetParent(parent, false);
-
-            RectTransform rect = go.GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0f, 0.5f);
-            rect.anchorMax = new Vector2(1f, 0.5f);
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-
             Text text = go.GetComponent<Text>();
             text.font = GetFont();
             text.fontSize = size;
@@ -300,7 +294,6 @@ namespace Identificaveis.Editor
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Overflow;
             text.supportRichText = true;
-            text.resizeTextForBestFit = false;
             return text;
         }
 
@@ -338,10 +331,18 @@ namespace Identificaveis.Editor
 
         private static Font GetFont()
         {
-            Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            Font font = null;
+            try
+            {
+                font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            }
+            catch
+            {
+            }
+
             if (font == null)
             {
-                font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+                font = Font.CreateDynamicFontFromOSFont(new[] { "Arial", "Liberation Sans", "Helvetica", "Tahoma", "DejaVu Sans" }, 16);
             }
 
             return font;
@@ -349,7 +350,7 @@ namespace Identificaveis.Editor
 
         private static Sprite GetUiSprite()
         {
-            return AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+            return AssetDatabase.LoadAssetAtPath<Sprite>(UiBaseSpritePath);
         }
 
         private static void EnsureFolder(string path)

@@ -258,13 +258,15 @@ namespace Identificaveis
             GameObject contentCard = _ui.CreateCard("ContentCard", column);
             RectTransform content = _ui.CreateVerticalContent(contentCard, new Vector2(28f, 28f), 18f, TextAnchor.UpperLeft);
 
-            GameObject profileTop = new GameObject("ProfileTop", typeof(RectTransform));
+            GameObject profileTop = new GameObject("ProfileTop", typeof(RectTransform), typeof(LayoutElement));
             profileTop.transform.SetParent(content, false);
+            LayoutElement profileTopLayoutElement = profileTop.GetComponent<LayoutElement>();
+            profileTopLayoutElement.flexibleWidth = 1f;
             HorizontalLayoutGroup profileTopLayout = profileTop.AddComponent<HorizontalLayoutGroup>();
             profileTopLayout.spacing = 18f;
             profileTopLayout.childAlignment = TextAnchor.MiddleLeft;
             profileTopLayout.childControlHeight = true;
-            profileTopLayout.childControlWidth = false;
+            profileTopLayout.childControlWidth = true;
             profileTopLayout.childForceExpandHeight = false;
             profileTopLayout.childForceExpandWidth = false;
             ContentSizeFitter profileTopFit = profileTop.AddComponent<ContentSizeFitter>();
@@ -1140,53 +1142,25 @@ namespace Identificaveis
 
         private Font LoadFont()
         {
-            string[] preferredFonts =
-            {
-                "Arial",
-                "Segoe UI",
-                "Roboto",
-                "Noto Sans",
-                "Liberation Sans",
-                "DejaVu Sans",
-                "Helvetica"
-            };
-
-            for (int i = 0; i < preferredFonts.Length; i++)
-            {
-                try
-                {
-                    Font dynamicFont = Font.CreateDynamicFontFromOSFont(preferredFonts[i], 16);
-                    if (dynamicFont != null)
-                    {
-                        return dynamicFont;
-                    }
-                }
-                catch
-                {
-                    // Continua tentando outras fontes instaladas no sistema.
-                }
-            }
-
             try
             {
-                Font fallback = Font.CreateDynamicFontFromOSFont(preferredFonts, 16);
-                if (fallback != null)
+                Font builtin = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                if (builtin != null)
                 {
-                    return fallback;
+                    return builtin;
                 }
             }
             catch
             {
-                // Ignora e segue para o último recurso.
             }
 
             try
+            {
+                return Font.CreateDynamicFontFromOSFont(new[] { "Arial", "Liberation Sans", "Helvetica", "Tahoma", "DejaVu Sans" }, 16);
+            }
+            catch
             {
                 return Font.CreateDynamicFontFromOSFont("Arial", 16);
-            }
-            catch
-            {
-                return new Font();
             }
         }
     }
