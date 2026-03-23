@@ -139,7 +139,7 @@ namespace Identificaveis
                 ? "Observe perfis e reações. Tente perceber o que soa humano de verdade."
                 : _database.subtitle;
 
-            _homeRoundLabel = _ui.CreateText("RoundLabel", heroContent, _theme.bodySize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
+            _homeRoundLabel = _ui.CreateText("RoundLabel", heroContent, _theme.smallSize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkSecondary);
             _homeRoundLabel.text = BuildMenuRoundText();
 
             GameObject statsRow = new GameObject("StatsRow", typeof(RectTransform));
@@ -242,10 +242,10 @@ namespace Identificaveis
         private GameObject BuildGameplayScreen(Transform parent)
         {
             GameObject screen = _ui.CreateScreen("GameplayScreen", parent);
-            RectTransform column = _ui.CreateSafeColumn("SafeArea", screen.transform, new Vector2(30f, 30f), 20f);
+            RectTransform column = _ui.CreateSafeColumn("SafeArea", screen.transform, new Vector2(28f, 28f), 18f);
 
             GameObject masthead = _ui.CreateShellCard("Masthead", column);
-            RectTransform mastheadContent = _ui.CreateVerticalContent(masthead, new Vector2(24f, 24f), 20f, TextAnchor.UpperLeft);
+            RectTransform mastheadContent = _ui.CreateVerticalContent(masthead, new Vector2(22f, 22f), 12f, TextAnchor.UpperLeft);
             _ui.CreateChip(mastheadContent, "Identificáveis");
             _phaseLabel = _ui.CreateText("PhaseLabel", mastheadContent, _theme.smallSize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.accent);
             _phaseLabel.text = "Fase";
@@ -261,10 +261,10 @@ namespace Identificaveis
                 contentCardLayout = contentCard.AddComponent<LayoutElement>();
             }
 
-            contentCardLayout.minHeight = 620f;
-            contentCardLayout.flexibleHeight = 1f;
+            contentCardLayout.minHeight = 0f;
+            contentCardLayout.flexibleHeight = 0f;
 
-            RectTransform content = _ui.CreateVerticalContent(contentCard, new Vector2(24f, 24f), 20f, TextAnchor.UpperLeft);
+            RectTransform content = _ui.CreateVerticalContent(contentCard, new Vector2(24f, 24f), 16f, TextAnchor.UpperLeft);
             _contentHeading = _ui.CreateText("ContentHeading", content, _theme.bodySize, FontStyle.Bold, TextAnchor.UpperLeft, _theme.inkPrimary);
             _contentHeading.text = string.Empty;
             _contentBody = _ui.CreateText("ContentBody", content, _theme.bodySize, FontStyle.Normal, TextAnchor.UpperLeft, _theme.inkPrimary);
@@ -283,7 +283,7 @@ namespace Identificaveis
             GameObject options = new GameObject("Options", typeof(RectTransform));
             options.transform.SetParent(column, false);
             VerticalLayoutGroup optionsLayout = options.AddComponent<VerticalLayoutGroup>();
-            optionsLayout.spacing = 20f;
+            optionsLayout.spacing = 12f;
             optionsLayout.childAlignment = TextAnchor.UpperCenter;
             optionsLayout.childControlHeight = true;
             optionsLayout.childControlWidth = true;
@@ -307,7 +307,7 @@ namespace Identificaveis
             GameObject footer = new GameObject("Footer", typeof(RectTransform));
             footer.transform.SetParent(column, false);
             HorizontalLayoutGroup footerLayout = footer.AddComponent<HorizontalLayoutGroup>();
-            footerLayout.spacing = 20f;
+            footerLayout.spacing = 12f;
             footerLayout.childAlignment = TextAnchor.MiddleCenter;
             footerLayout.childControlHeight = true;
             footerLayout.childControlWidth = true;
@@ -557,7 +557,7 @@ namespace Identificaveis
             _contentHeading.text = "Perfil";
             _readingChip.SetActive(true);
             _readingChipLabel.text = "Observe bio e publicação antes de escolher.";
-            _contentBody.text = "Bio\n\n" + profile.bio + "\n\nPublicação\n\n\u201c" + profile.post + "\u201d";
+            _contentBody.text = "Bio\n\n" + profile.bio + "\n\n\nPublicação\n\n\u201c" + profile.post + "\u201d";
 
             ConfigureOptionButton(0, "Parece humano", true, "H");
             ConfigureOptionButton(1, "Parece algoritmo", true, "IA");
@@ -569,6 +569,7 @@ namespace Identificaveis
             _nextButton.label.text = "Próximo";
             SetOptionInteractable(true);
             _session.waitingForAdvance = false;
+            ForceGameplayLayout();
         }
 
         private void RenderPrompt(PhaseType phase, ScenarioContentData prompt)
@@ -582,6 +583,8 @@ namespace Identificaveis
             _readingChip.SetActive(true);
             _readingChipLabel.text = GetReadingChipText(phase);
             _contentBody.text = prompt.eventText;
+
+            ForceGameplayLayout();
 
             System.Array.Clear(_displayedScenarioChoices, 0, _displayedScenarioChoices.Length);
             var options = new System.Collections.Generic.List<ScenarioChoiceData>();
@@ -931,6 +934,16 @@ namespace Identificaveis
             }
         }
 
+        private void ForceGameplayLayout()
+        {
+            if (_gameplayScreen == null)
+            {
+                return;
+            }
+
+            Canvas.ForceUpdateCanvases();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_gameplayScreen.GetComponent<RectTransform>());
+        }
 
         private bool IsPromptPhase(PhaseType phase)
         {
@@ -1227,7 +1240,7 @@ namespace Identificaveis
         private string BuildMenuRoundText()
         {
             int total = _database.profilesPerRun + _database.reactionsPerRun + _database.commentsPerRun + _database.messagesPerRun + _database.justificationsPerRun;
-            return "Cada rodada atravessa 5 fases e " + total + " leituras. Uma partida costuma durar de 5 a 8 minutos.";
+            return "Cada rodada tem " + total + " leituras e costuma durar entre 5 e 8 minutos.";
         }
 
         private void RefreshMenuLabels()
