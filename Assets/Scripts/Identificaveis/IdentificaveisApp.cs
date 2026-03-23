@@ -92,6 +92,24 @@ namespace Identificaveis
             ShowHome();
         }
 
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                RequestQuit();
+            }
+        }
+
+        private void RequestQuit()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }
+
         private void BuildUi()
         {
             GameObject canvasGo = new GameObject("IdentificaveisCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
